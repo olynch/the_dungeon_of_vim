@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.com/POM/4.0.0"
+		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xsi:schemalocation="http://maven.apache.com/POM/4.0.0 http://maven.apache.com/xsd/maven-4.0.0.xsd">
+	 <modelVersion>4.0.0</modelVersion>
+
+	 <groupId>cheshircat</groupId>
+	 <artifactId>the-dungeon-of-vim</artifactId>
+	 <version>0.1-SNAPSHOT</version>
+	 <packaging>jar</packaging>
+	 <url>https://github.com/olynch/the_dungeon_of_vim</url>
+
+	 <properties>
+	 </properties>
+
+	 <repositories>
+		 <repository>
+			 <id>rubygems-proxy</id>
+			 <name>Rubygems Proxy</name>
+			 <url>http://rubygems-proxy.torquebox.org/releases</url>
+			 <layout>default</layout>
+			 <releases>
+				 <enabled>true</enabled>
+			 </releases>
+			 <snapshots>
+				 <enabled>false</enabled>
+				 <updatePolicy>never</updatePolicy>
+			 </snapshots>
+		 </repository>
+	 </repositories>
+
+	 <build>
+	 </build>
+
+	 <dependencies>
+		 <dependency>
+			 <groupId>org.jruby</groupId>
+			 <artifactId>jruby-complete</artifactId>
+			 <version>9.0.0.0.pre1</version>
+		 </dependency>
+		 <dependency>
+			 <groupId>com.googlecode.lanterna</groupId>
+			 <artifactId>lanterna</artifactId>
+			 <version>3.0.0-alpha6</version>
+		 </dependency>
+		 <dependency>
+			 <groupId>rubygems</groupId>
+			 <artifactId>bson</artifactId>
+			 <version>3.0.0</version>
+			 <type>gem</type>
+		 </dependency>
+	 </dependencies>
+ </project>
