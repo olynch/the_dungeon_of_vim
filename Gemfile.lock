@@ -1,10 +1,15 @@
 GEM
   remote: https://rubygems.org/
   specs:
+    ffi (1.9.6)
     ncursesw (1.4.9)
+    rb_termbox (0.2.0)
+      ffi
 
 PLATFORMS
+  java
   ruby
 
 DEPENDENCIES
   ncursesw (~> 1.4.9)
+  rb_termbox (~> 0.2.0)
