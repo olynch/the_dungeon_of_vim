@@ -3,7 +3,6 @@ GEM
   specs:
     ffi (1.9.6)
     ffi (1.9.6-java)
-    ncursesw (1.4.9)
     rb_termbox (0.2.0)
       ffi
 
@@ -13,5 +12,7 @@ PLATFORMS
 
 DEPENDENCIES
   ffi (~> 1.9.6)
-  ncursesw (~> 1.4.9)
   rb_termbox (~> 0.2.0)
+
+BUNDLED WITH
+   1.10.3
