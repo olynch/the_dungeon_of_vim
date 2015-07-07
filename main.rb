@@ -136,6 +136,28 @@ def win
     exit
 end
 
+def visible?(x1, y1, x2, y2)
+    eval(if x1<x2 then "x1.upto(x2-1)"
+        else "x1.downto(x2+1)"
+        end)
+    .each do |x|
+        y = (((y2-y1)*(x-x1)).fdiv(x2-x1)+y1).round #no divide-by-zero problem because x1.upto(x2-1) won't run anything if x1==x2
+        if $map[y][x] == ?# || $map[y][x] == ?| then
+            return false
+        end
+    end
+    eval(if y1<y2 then "y1.upto(y2-1)"
+        else "y1.downto(y2+1)"
+        end)
+    .each do |y|
+        x = (((x2-x1)*(y-y1)).fdiv(y2-y1)+x1).round
+        if $map[y][x] == ?# || $map[y][x] == ?| then
+            return false
+        end
+    end
+    return true
+end
+
 def occupied?(x, y)
     return (not ($map[y][x] == nil))
 end
@@ -145,7 +167,11 @@ def display()
     $map.each_index do |y|
         $map[y].each_index do |x|
             if not $map[y][x].nil? then
-                Termbox.tb_change_cell x, y, $map[y][x].ord, 0, 0
+                if visible? $mex, $mey, x, y then
+                    Termbox.tb_change_cell x, y, $map[y][x].ord, 2, 0
+                else
+                    Termbox.tb_change_cell x, y, $map[y][x].ord, 0, 0
+                end
             end
         end
     end
