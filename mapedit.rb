@@ -57,10 +57,13 @@ class Map
 	end
 
 	def [](y, x)
-		@grid[y * @xdim + x]
+		@grid[y * @xdim + x] unless y >= @ydim or y < 0 or x >= @xdim or x < 0
 	end
 
 	def []=(y, x, thing)
+		if y >= @ydim or y < 0 or x >= @xdim or x < 0
+			return nil
+		end
 		thing.map = self
 		thing.y = y
 		thing.x = x
