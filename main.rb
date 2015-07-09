@@ -120,7 +120,7 @@ end
 def collision?(x, y)
     if $map[y][x] == ?k then $items << "key" end
     if $map[y][x] == ?| && $items.include?("key") then
-        $items.delete("key")
+        $items.delete_at($items.find_index("key"))
         $map[y][x] = nil
     end
     if $map[y][x] == ?* then win end
@@ -131,25 +131,21 @@ def win
     exit
 end
 
-def visible?(x1, y1, x2, y2)
-    eval(if x1<x2 then "x1.upto(x2-1)"
-        else "x1.downto(x2+1)"
-        end)
-    .each do |x|
-        yu = (((y2-y1)*(x-x1)).fdiv(x2-x1)+y1).ceil #no divide-by-zero problem because x1.upto(x2-1) won't run anything if x1==x2
-        yl = (((y2-y1)*(x-x1)).fdiv(x2-x1)+y1).floor
-        if ($map[yu][x] == ?# || $map[yu][x] == ?|) && ($map[yl][x] == ?# || $map[yl][x] == ?|) then
-            return false
+def visible?(p0, p1)
+    rmap = $map.transpose
+    [[0,1], [1,0]].each do |c|
+        if p0[c[0]]<p1[c[0]] then p0[c[0]].upto(p1[c[0]]-1)
+        else p0[c[0]].downto(p1[c[0]]+1)
         end
-    end
-    eval(if y1<y2 then "y1.upto(y2-1)"
-        else "y1.downto(y2+1)"
-        end)
-    .each do |y|
-        xu = (((x2-x1)*(y-y1)).fdiv(y2-y1)+x1).ceil
-        xl = (((x2-x1)*(y-y1)).fdiv(y2-y1)+x1).floor
-        if ($map[y][xu] == ?# || $map[y][xu] == ?|) && ($map[y][xl] == ?# || $map[y][xl] == ?|) then
-            return false
+        .each do |c0|
+            c1 =  (((p1[c[1]]-p0[c[1]])*(c0-p0[c[0]])).fdiv(p1[c[0]]-p0[c[0]])+p0[c[1]]) #no divide-by-zero problem because x1.upto(x2-1) won't run anything if x1==x2
+            c1u = c1.ceil
+            c1l = c1.floor
+            u = [c0, c1u]
+            l = [c0, c1l]
+            if ($map[u[c[0]]][u[c[1]]] == ?# || $map[u[c[0]]][u[c[1]]] == ?|) && ($map[l[c[0]]][l[c[1]]] == ?# || $map[l[c[0]]][l[c[1]]] == ?|) then
+                return false
+            end
         end
     end
     return true
@@ -164,7 +160,7 @@ def display()
     $map.each_index do |y|
         $map[y].each_index do |x|
             if not $map[y][x].nil? then
-                if visible? $mex, $mey, x, y then
+                if visible? [$mey, $mex], [y, x] then
                     Termbox.tb_change_cell x, y, $map[y][x].ord, 4, 0
                 else
                     Termbox.tb_change_cell x, y, $map[y][x].ord, 1, 0
