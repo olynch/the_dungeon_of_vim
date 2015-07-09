@@ -43,16 +43,6 @@ Termbox.initialize_library
 
 #$dngn = Dungeon.new(Dungeon.parse("dungeon.txt"))
 
-$map = [[?#, ?#, ?#, ?#, ?#,  0,  0,  0,  0,  0],
-        [?#,  0,  0,  0, ?#, ?#, ?#, ?#, ?#,  0],
-        [?#,  0,  0,  0,  0,  0,  0,  0, ?#,  0],
-        [?#,  0, ?@,  0,  0,  0, ?#, ?#, ?#,  0],
-        [?#,  0,  0,  0, ?#, ?#, ?#,  0,  0,  0],
-        [?#, ?#, ?#, ?#, ?#,  0,  0,  0,  0,  0]]
-
-
-$mey = $map.index { |r| $mex = r.index { |x| x == ?@ } }
-
 def parse_dun(fn)
     File.open(fn, ?r) do |f|
         return f.each_line.map do |ln|
@@ -78,9 +68,10 @@ end
 
 $map = parse_dun("dungeon.txt")
 
+$items = []
+
 
 $mey = $map.index { |r| $mex = r.index { |x| x == ?@ } }
-$havekey = false
 
 def keyboard_controls()
     ev = Termbox::Event.new
@@ -127,9 +118,13 @@ def keyboard_controls()
 end
 
 def collision?(x, y)
-    if $map[y][x] == ?k then $havekey = true end
+    if $map[y][x] == ?k then $items << "key" end
+    if $map[y][x] == ?| && $items.include?("key") then
+        $items.delete("key")
+        $map[y][x] = nil
+    end
     if $map[y][x] == ?* then win end
-    return ($map[y][x] == ?#) || ($map[y][x] == ?| && $havekey==false)
+    return $map[y][x] == ?# || $map[y][x] == ?|
 end
 
 def win
@@ -141,8 +136,9 @@ def visible?(x1, y1, x2, y2)
         else "x1.downto(x2+1)"
         end)
     .each do |x|
-        y = (((y2-y1)*(x-x1)).fdiv(x2-x1)+y1).round #no divide-by-zero problem because x1.upto(x2-1) won't run anything if x1==x2
-        if $map[y][x] == ?# || $map[y][x] == ?| then
+        yu = (((y2-y1)*(x-x1)).fdiv(x2-x1)+y1).ceil #no divide-by-zero problem because x1.upto(x2-1) won't run anything if x1==x2
+        yl = (((y2-y1)*(x-x1)).fdiv(x2-x1)+y1).floor
+        if ($map[yu][x] == ?# || $map[yu][x] == ?|) && ($map[yl][x] == ?# || $map[yl][x] == ?|) then
             return false
         end
     end
@@ -150,8 +146,9 @@ def visible?(x1, y1, x2, y2)
         else "y1.downto(y2+1)"
         end)
     .each do |y|
-        x = (((x2-x1)*(y-y1)).fdiv(y2-y1)+x1).round
-        if $map[y][x] == ?# || $map[y][x] == ?| then
+        xu = (((x2-x1)*(y-y1)).fdiv(y2-y1)+x1).ceil
+        xl = (((x2-x1)*(y-y1)).fdiv(y2-y1)+x1).floor
+        if ($map[y][xu] == ?# || $map[y][xu] == ?|) && ($map[y][xl] == ?# || $map[y][xl] == ?|) then
             return false
         end
     end
@@ -168,9 +165,9 @@ def display()
         $map[y].each_index do |x|
             if not $map[y][x].nil? then
                 if visible? $mex, $mey, x, y then
-                    Termbox.tb_change_cell x, y, $map[y][x].ord, 2, 0
+                    Termbox.tb_change_cell x, y, $map[y][x].ord, 4, 0
                 else
-                    Termbox.tb_change_cell x, y, $map[y][x].ord, 0, 0
+                    Termbox.tb_change_cell x, y, $map[y][x].ord, 1, 0
                 end
             end
         end
