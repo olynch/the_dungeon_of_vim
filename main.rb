@@ -47,20 +47,11 @@ def parse_dun(fn)
     File.open(fn, ?r) do |f|
         return f.each_line.map do |ln|
             ln.each_char.map do |c|
-                case c
-                when ?#
-                    ?#
-                when ?@
-                    ?@
-                when ?k
-                    ?k
-                when ?|
-                    ?|
-                when ?*
-                    ?*
-                else
-                    nil
-                end
+								if c in [?#, ?@, ?k, ?|, ?*]
+									c
+								else
+									nil
+								end
             end
         end
     end
