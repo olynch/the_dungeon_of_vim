@@ -47,11 +47,11 @@ def parse_dun(fn)
     File.open(fn, ?r) do |f|
         return f.each_line.map do |ln|
             ln.each_char.map do |c|
-								if c in [?#, ?@, ?k, ?|, ?*]
-									c
-								else
-									nil
-								end
+                if [?#, ?@, ?k, ?|, ?*].include? c then
+                    c
+                else
+                    nil
+                end
             end
         end
     end
@@ -134,7 +134,10 @@ def visible?(p0, p1)
             c1l = c1.floor
             u = [c0, c1u]
             l = [c0, c1l]
-            if ($map[u[c[0]]][u[c[1]]] == ?# || $map[u[c[0]]][u[c[1]]] == ?|) && ($map[l[c[0]]][l[c[1]]] == ?# || $map[l[c[0]]][l[c[1]]] == ?|) then
+            if [[c0, c1u], [c0, c1l]].map do |e|
+                    ($map[e[c[0]]][e[c[1]]] == ?# || $map[e[c[0]]][e[c[1]]] == ?|)
+                end.all?
+            then
                 return false
             end
         end
@@ -159,7 +162,6 @@ def display()
             end
         end
     end
-    #Termbox.tb_change_cell $mex, $mey, ?@.ord, 0, 0
     Termbox.tb_present
 end
 

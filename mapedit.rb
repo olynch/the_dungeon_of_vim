@@ -1,4 +1,4 @@
-class Thing
+lass Thing
 	attr_accessor :map, :y, :x
 	def ch
 		nil
