@@ -50,7 +50,7 @@ class Key < Thing
   end
 
   def ch
-    ?k
+    ?Ƒ
   end
 
   def inspect
