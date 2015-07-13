@@ -80,7 +80,11 @@ class Map
     @width = width
     @height = height
     @grid = grid ? grid : Array.new(width * height, nil)
-    @grid.each.with_index { |thing, i| thing.map = self; thing.x = i / width; thing.y = i % width }
+    @grid.each.with_index do |thing, i|
+      if not thing.nil? then
+        thing.map = self; thing.x = i / width; thing.y = i % width
+      end
+    end
   end
 
   def [](x, y)
