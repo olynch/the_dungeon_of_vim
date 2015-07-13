@@ -20,6 +20,8 @@ $map = parse_dun("dungeon.txt")
 
 $items = []
 
+$text = ""
+
 
 $mey = $map.index { |r| $mex = r.index { |x| x == ?@ } }
 
@@ -67,6 +69,11 @@ def keyboard_controls()
     move_enemy
   end
 end
+
+def text(str)
+  $text << str
+end
+
 
 def move_enemy()
   buffer = []
@@ -135,10 +142,25 @@ def display()
       end
     end
   end
+  disptext($map.length, 0)
   Termbox.tb_present
 end
 
+def disptext(y, x)
+  ox = x
+  $text.each_char.with_index do |c, i|
+    if c == ?\n then
+      y+=1
+      x = ox
+    else
+      Termbox.tb_change_cell x, y, c.ord, 1, 0
+      x+=1
+    end
+  end
+end
+
 def main()
+  text "hello, world\n"
   display
   keyboard_controls
 end
