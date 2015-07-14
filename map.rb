@@ -11,7 +11,7 @@ class Player < Thing
     @inventory = inventory || []
   end
 
-  def give(thing)
+  def <<(thing)
     @inventory.push(thing)
   end
 
