@@ -3,6 +3,10 @@ class Thing
   def ch
     nil
   end
+
+  def blocked_vision?
+    false
+  end
 end
 
 class Player < Thing
@@ -19,6 +23,31 @@ class Player < Thing
     ?@
   end
 
+  def visible?(p)
+    self.map.visible?([self.x, self.y], p)
+  end
+
+  def display
+    if @old_map.nil? then
+      @old_map = Map.new(10, 10)
+    end
+
+    @old_map.each_thing do |t|
+      if not self.visible? [t.x, t.y] then
+        Termbox.tb_change_cell t.x, t.y, t.ch.ord, 1, 0
+      else
+        @old_map[t.x, t.y] = nil
+      end
+    end
+
+    self.map.each_thing do |t|
+      if self.visible?([t.x, t.y]) then
+        Termbox.tb_change_cell t.x, t.y, t.ch.ord, 4, 0
+        @old_map << t.dup
+      end
+    end
+  end
+
   def inspect
     "Player.new(#{@attr}, #{@inventory})"
   end
@@ -29,6 +58,10 @@ class NilClass
   def ch
     ' '
   end
+
+  def blocked_vision?
+    false
+  end
 end
 
 class Wall < Thing
@@ -37,6 +70,10 @@ class Wall < Thing
 
   def ch
     ?#
+  end
+
+  def blocked_vision?
+    true
   end
 
   def inspect
@@ -70,12 +107,17 @@ class Door < Thing
     if @open then ?| else ?¦ end
   end
 
+  def blocked_vision?
+    true
+  end
+
   def inspect
     "Door.new(#{@name}, #{@open})"
   end
 end
 
 class Map
+  attr_accessor :width, :height
   def initialize(width, height, grid=nil)
     @width = width
     @height = height
@@ -101,6 +143,47 @@ class Map
       thing.y = y
     end
     @grid[x * @height + y] = thing
+  end
+
+  def <<(thing)
+    if thing.x >= @width or thing.x < 0 or thing.y >= @height or thing.y <0 then
+      return nil
+    end
+    thing.map = self
+    old_thing = @grid[thing.x * @height + thing.y]
+    @grid[thing.x * @height + thing.y] = thing
+    return old_thing
+  end
+
+  def each_thing
+    @grid.each do |thing|
+      yield thing unless thing.nil?
+    end
+  end
+
+  def visible?(p0, p1)
+    [[0,1], [1,0]].each do |c|
+      if p0[c[0]]<p1[c[0]] then
+        p0[c[0]].upto(p1[c[0]]-1)
+      else p0[c[0]].downto(p1[c[0]]+1)
+      end
+      .each do |c0|
+        c1 =  (((p1[c[1]]-p0[c[1]])*(c0-p0[c[0]])).fdiv(p1[c[0]]-p0[c[0]])+p0[c[1]]) #no divide-by-zero problem because x1.upto(x2-1) won't run anything if x1==x2
+        if [[c0, c1.ceil], [c0, c1.floor]].all? do |e| #e for estimate
+          self[e[c[0]], e[c[1]]].block_vision?
+        end
+        then
+        return false
+        end
+      end
+    end
+    return true
+  end
+
+  def display
+    self.each_thing do |t|
+      Termbox.tb_change_cell t.x, t.y, t.ch.ord, 4, 0
+    end
   end
 
   def inspect
