@@ -18,10 +18,13 @@ module Maptest
   0.upto(9) do |i|
     MAP[0, i] = Wall.new
     MAP[9, i] = Wall.new
+    MAP[i, 5] = Wall.new
     MAP[i, 0] = Wall.new
     MAP[i, 9] = Wall.new
   end
-  MAP[2,2] = Player.new([])
+  MAP[5,5] = nil
+  JOHN = Player.new([])
+  MAP[2,2] = JOHN
 end
 
 #begin
