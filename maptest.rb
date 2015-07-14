@@ -20,15 +20,15 @@ module Maptest
     MAP[9, i] = Wall.new
     MAP[i, 0] = Wall.new
     MAP[i, 9] = Wall.new
-    MAP
   end
+  MAP[2,2] = Player.new([])
 end
 
-begin
-  Termbox.tb_init
-  loop do
-    Maptest::MAP.disp
-  end
-ensure
-  Termbox.tb_shutdown
-end
+#begin
+  #Termbox.tb_init
+  #loop do
+    #Maptest::MAP.disp
+  #end
+#ensure
+  #Termbox.tb_shutdown
+#end
