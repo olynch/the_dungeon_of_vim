@@ -95,9 +95,11 @@ class Map
     if x >= @width or x < 0 or y >= @height or y < 0 then
       return nil
     end
-    thing.map = self
-    thing.x = x
-    thing.y = y
+    unless thing.nil? then
+      thing.map = self
+      thing.x = x
+      thing.y = y
+    end
     @grid[x * @height + y] = thing
   end
 
