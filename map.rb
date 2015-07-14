@@ -8,7 +8,7 @@ end
 class Player < Thing
   def initialize(attr, inventory = nil)
     @attr = attr
-    @inventory = if inventory then inventory else [] end
+    @inventory = inventory || []
   end
 
   def give(thing)
@@ -79,7 +79,7 @@ class Map
   def initialize(width, height, grid=nil)
     @width = width
     @height = height
-    @grid = grid ? grid : Array.new(width * height, nil)
+    @grid = grid || Array.new(width * height, nil)
     @grid.each.with_index do |thing, i|
       if not thing.nil? then
         thing.map = self; thing.x = i / width; thing.y = i % width
