@@ -11,7 +11,7 @@ class Player < Thing
     @inventory = if inventory then inventory else [] end
   end
 
-  def give(thing)
+  def <<(thing)
     @inventory.push(thing)
   end
 
