@@ -12,10 +12,17 @@ class Thing
     false
   end
 
+  def collision!(p)
+  end
+
   def move(dir, amt)
     self.map[self.x, self.y] = nil
     self.send dir + "=", (self.send dir) + amt
     self.map[self.x, self.y] = self
+  end
+
+  def inspect
+    "Thing.new"
   end
 end
 
@@ -96,9 +103,6 @@ class Wall < Thing
 
   def collision?
     true
-  end
-
-  def collision!(p)
   end
 
   def inspect
