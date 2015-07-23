@@ -6,6 +6,11 @@ Termbox.initialize_library
 class Thing
   def collision!(p)
   end
+  def move(dir, amt)
+    self.map[self.x, self.y] = nil
+    self.send dir + "=", (self.send dir) + amt
+    self.map[self.x, self.y] = self
+  end
 end
 
 class Key
@@ -41,14 +46,9 @@ def parse_dun(fn)
   end
 end
 
-$map = parse_dun("dungeon.txt")
-
 $items = []
 
 $text = ""
-
-
-$mey = $map.index { |r| $mex = r.index { |x| x == ?@ } }
 
 def keyboard_controls()
   ev = Termbox::Event.new
@@ -59,33 +59,24 @@ def keyboard_controls()
     when 0xFFFF-18
       Maptest::MAP[Maptest::JOHN.x, Maptest::JOHN.y-1].collision! Maptest::JOHN
       unless Maptest::MAP[Maptest::JOHN.x, Maptest::JOHN.y-1].collision? then
-        Maptest::MAP[Maptest::JOHN.x, Maptest::JOHN.y] = nil
-        Maptest::JOHN.y-=1
-        Maptest::MAP[Maptest::JOHN.x, Maptest::JOHN.y] = Maptest::JOHN
+        Maptest::JOHN.move(?y, -1)
       end
     when 0xFFFF-19
       Maptest::MAP[Maptest::JOHN.x, Maptest::JOHN.y+1].collision! Maptest::JOHN
       unless Maptest::MAP[Maptest::JOHN.x, Maptest::JOHN.y+1].collision? then
-        Maptest::MAP[Maptest::JOHN.x, Maptest::JOHN.y] = nil
-        Maptest::JOHN.y+=1
-        Maptest::MAP[Maptest::JOHN.x, Maptest::JOHN.y] = Maptest::JOHN
+        Maptest::JOHN.move(?y, 1)
       end
     when 0xFFFF-20
       Maptest::MAP[Maptest::JOHN.x-1, Maptest::JOHN.y].collision! Maptest::JOHN
       unless Maptest::MAP[Maptest::JOHN.x-1, Maptest::JOHN.y].collision? then
-        Maptest::MAP[Maptest::JOHN.x, Maptest::JOHN.y] = nil
-        Maptest::JOHN.x-=1
-        Maptest::MAP[Maptest::JOHN.x, Maptest::JOHN.y] = Maptest::JOHN
+        Maptest::JOHN.move(?x, -1)
       end
     when 0xFFFF-21
       Maptest::MAP[Maptest::JOHN.x+1, Maptest::JOHN.y].collision! Maptest::JOHN
       unless Maptest::MAP[Maptest::JOHN.x+1, Maptest::JOHN.y].collision? then
-        Maptest::MAP[Maptest::JOHN.x, Maptest::JOHN.y] = nil
-        Maptest::JOHN.x+=1
-        Maptest::MAP[Maptest::JOHN.x, Maptest::JOHN.y] = Maptest::JOHN
+        Maptest::JOHN.move(?x, 1)
       end
     end
-    move_enemy
   end
 end
 
@@ -93,21 +84,21 @@ def text(str)
   $text << str
 end
 
-def move_enemy()
-  buffer = []
-  buffer = $map.map { |x| x.map {|y| y}}
-  $map.each_index do |y|
-    $map[y].each_index do |x|
-      if $map[y][x] == ?e then
-        buffer[y][x] = nil
-        ev = ["[y-1][x]", "[y][x-1]", "[y][x]", "[y+1][x]", "[y][x+1]"].map {|x| "buffer" + x}
-        ev.keep_if { |a| (eval a).nil? }
-        eval (ev.sample + " = ?e")
-      end
-    end
-  end
-  $map = buffer
-end
+#def move_enemy()
+  #buffer = []
+  #buffer = $map.map { |x| x.map {|y| y}}
+  #$map.each_index do |y|
+    #$map[y].each_index do |x|
+      #if $map[y][x] == ?e then
+        #buffer[y][x] = nil
+        #ev = ["[y-1][x]", "[y][x-1]", "[y][x]", "[y+1][x]", "[y][x+1]"].map {|x| "buffer" + x}
+        #ev.keep_if { |a| (eval a).nil? }
+        #eval (ev.sample + " = ?e")
+      #end
+    #end
+  #end
+  #$map = buffer
+#end
 
 def win
   exit
