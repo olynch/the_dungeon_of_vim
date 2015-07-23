@@ -3,35 +3,6 @@ require './maptest.rb'
 
 Termbox.initialize_library
 
-class Thing
-  def collision!(p)
-  end
-  def move(dir, amt)
-    self.map[self.x, self.y] = nil
-    self.send dir + "=", (self.send dir) + amt
-    self.map[self.x, self.y] = self
-  end
-end
-
-class Key
-  def collision!(p)
-    p << self
-  end
-end
-
-class Door
-  def collision!(p)
-    if p.inventory.find_index {|k| k.is_a?(Key) && k.door_name == self.name}
-      self.open = true
-    end
-  end
-end
-
-class NilClass
-  def collision!(p)
-  end
-end
-
 def parse_dun(fn)
   File.open(fn, ?r) do |f|
     return f.each_line.map do |ln|

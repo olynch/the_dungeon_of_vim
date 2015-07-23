@@ -4,12 +4,17 @@ class Thing
     nil
   end
 
-  def blocked_vision?
+  def collision?
+    false
+  end
+
+  def blocks_vision?
     false
   end
 end
 
 class Player < Thing
+  attr_accessor :inventory
   def initialize(attr, inventory = nil)
     @attr = attr
     @inventory = inventory || []
@@ -29,7 +34,7 @@ class Player < Thing
 
   def display
     if @old_map.nil? then
-      @old_map = Map.new(10, 10)
+      @old_map = Map.new(20, 10)
     end
 
     @old_map.each_thing do |t|
@@ -59,8 +64,15 @@ class NilClass
     ' '
   end
 
-  def blocked_vision?
+  def collision?
     false
+  end
+
+  def blocks_vision?
+    false
+  end
+
+  def collision!(p)
   end
 end
 
@@ -72,8 +84,21 @@ class Wall < Thing
     ?#
   end
 
-  def blocked_vision?
+  def blocks_vision?
     true
+  end
+
+  def collision?
+    true
+  end
+
+  def collision!(p)
+  end
+
+  def move(dir, amt)
+    self.map[self.x, self.y] = nil
+    self.send dir + "=", (self.send dir) + amt
+    self.map[self.x, self.y] = self
   end
 
   def inspect
@@ -82,12 +107,17 @@ class Wall < Thing
 end
 
 class Key < Thing
+  attr_reader :door_name
   def initialize(door_name)
     @door_name = door_name
   end
 
   def ch
     ?Ƒ
+  end
+
+  def collision!(p)
+    p << self
   end
 
   def inspect
@@ -104,11 +134,21 @@ class Door < Thing
   end
 
   def ch
-    if @open then ?| else ?¦ end
+    if @open then ?¦ else ?| end
   end
 
-  def blocked_vision?
-    true
+  def blocks_vision?
+    !@open
+  end
+
+  def collision?
+    !@open
+  end
+
+  def collision!(p)
+    if p.inventory.find_index {|k| k.is_a?(Key) && k.door_name == self.name}
+      self.open = true
+    end
   end
 
   def inspect
@@ -170,7 +210,7 @@ class Map
       .each do |c0|
         c1 =  (((p1[c[1]]-p0[c[1]])*(c0-p0[c[0]])).fdiv(p1[c[0]]-p0[c[0]])+p0[c[1]]) #no divide-by-zero problem because x1.upto(x2-1) won't run anything if x1==x2
         if [[c0, c1.ceil], [c0, c1.floor]].all? do |e| #e for estimate
-          self[e[c[0]], e[c[1]]].block_vision?
+          self[e[c[0]], e[c[1]]].blocks_vision?
         end
         then
         return false
