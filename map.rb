@@ -11,6 +11,12 @@ class Thing
   def blocks_vision?
     false
   end
+
+  def move(dir, amt)
+    self.map[self.x, self.y] = nil
+    self.send dir + "=", (self.send dir) + amt
+    self.map[self.x, self.y] = self
+  end
 end
 
 class Player < Thing
@@ -93,12 +99,6 @@ class Wall < Thing
   end
 
   def collision!(p)
-  end
-
-  def move(dir, amt)
-    self.map[self.x, self.y] = nil
-    self.send dir + "=", (self.send dir) + amt
-    self.map[self.x, self.y] = self
   end
 
   def inspect
