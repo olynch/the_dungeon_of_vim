@@ -1,3 +1,48 @@
+class Square < Array
+  attr_accessor :x, :y, :map
+  def ch
+    if self == [] then
+      return ' '
+    else
+      self.reverse.max_by {|t| t.show_priority}.ch
+    end
+  end
+
+  def x=(x)
+    self.each {|t| t.x=x}
+    @x=x
+  end
+
+  def y=(y)
+    self.each {|t| t.y=y}
+    @y=y
+  end
+
+  def <<(t)
+    t.x = self.x
+    t.y = self.y
+    t.map = self.map
+    super
+  end
+
+  def collision?
+    self.any? {|t| t.collision?}
+  end
+
+  def collision!(p)
+    self.each {|t| t.collision! p}
+  end
+
+  def map=(map)
+    self.each {|t| t.map=map}
+    @map = map
+  end
+
+  def blocks_vision?
+    self.any? {|t| t.blocks_vision?}
+  end
+end
+
 class Thing
   attr_accessor :map, :x, :y
   def ch
@@ -16,9 +61,9 @@ class Thing
   end
 
   def move(dir, amt)
-    self.map[self.x, self.y] = nil
+    self.map[self.x, self.y].delete(self)
     self.send dir + "=", (self.send dir) + amt
-    self.map[self.x, self.y] = self
+    self.map << self
   end
 
   def inspect
@@ -50,20 +95,28 @@ class Player < Thing
       @old_map = Map.new(20, 10)
     end
 
-    @old_map.each_thing do |t|
-      if not self.visible? [t.x, t.y] then
-        Termbox.tb_change_cell t.x, t.y, t.ch.ord, 1, 0
+puts("I:")
+self.map.p_e
+
+    @old_map.each_square do |s|
+      if not self.visible? [s.x, s.y] then
+        Termbox.tb_change_cell s.x, s.y, s.ch.ord, 1, 0
       else
-        @old_map[t.x, t.y] = nil
+        @old_map[s.x, s.y] = Square.new
       end
     end
 
-    self.map.each_thing do |t|
-      if self.visible?([t.x, t.y]) then
-        Termbox.tb_change_cell t.x, t.y, t.ch.ord, 4, 0
-        @old_map << t.dup
+puts("II:")
+self.map.p_e
+
+    self.map.each_square do |s|
+      if self.visible? [s.x, s.y] then
+        Termbox.tb_change_cell s.x, s.y, s.ch.ord, 4, 0
+        @old_map << s.dup
       end
     end
+puts("III:")
+self.map.p_e
   end
 
   def inspect
@@ -71,23 +124,23 @@ class Player < Thing
   end
 end
 
-class NilClass
-  attr_accessor :x, :y, :map
-  def ch
-    ' '
-  end
+#class NilClass
+  #attr_accessor :x, :y, :map
+  #def ch
+    #' '
+  #end
 
-  def collision?
-    false
-  end
+  #def collision?
+    #false
+  #end
 
-  def blocks_vision?
-    false
-  end
+  #def blocks_vision?
+    #false
+  #end
 
-  def collision!(p)
-  end
-end
+  #def collision!(p)
+  #end
+#end
 
 class Wall < Thing
   def initialize
@@ -165,28 +218,31 @@ class Map
   def initialize(width, height, grid=nil)
     @width = width
     @height = height
-    @grid = grid || Array.new(width * height, nil)
-    @grid.each.with_index do |thing, i|
-      if not thing.nil? then
-        thing.map = self; thing.x = i / width; thing.y = i % width
-      end
+    @grid = grid || Array.new(width * height, Square.new)
+    @grid.each.with_index do |square, i|
+      square.map = self; square.x = i / height; square.y = i % height
+      puts square.x
     end
+    puts("BEFORE_FIRST")
+    self.p_e
   end
 
   def [](x, y)
-    @grid[x * @height + y] unless x >= @width or x < 0 or y >= @height or y < 0
+    if x < @width and x >= 0 and y < @height and y >= 0 then
+      @grid[x * @height + y]
+    else
+      Square.new
+    end
   end
 
-  def []=(x, y, thing)
+  def []=(x, y, square)
     if x >= @width or x < 0 or y >= @height or y < 0 then
       return nil
     end
-    unless thing.nil? then
-      thing.map = self
-      thing.x = x
-      thing.y = y
-    end
-    @grid[x * @height + y] = thing
+    square.map = self
+    square.x = x
+    square.y = y
+    @grid[x * @height + y] = square
   end
 
   def <<(thing)
@@ -194,14 +250,35 @@ class Map
       return nil
     end
     thing.map = self
-    old_thing = @grid[thing.x * @height + thing.y]
-    @grid[thing.x * @height + thing.y] = thing
-    return old_thing
+    #old_thing = @grid[thing.x * @height + thing.y]
+    if thing.is_a? Square then
+      @grid[thing.x * @height + thing.y] = thing
+    elsif thing.is_a? Thing then
+      @grid[thing.x * @height + thing.y] << thing
+    end
+    #return old_thing
+  end
+
+  def p_e
+    @grid.each do |s|
+      print s.x
+      print ", "
+      print s.y
+      puts
+    end
+  end
+
+  def each_square
+    @grid.each do |square|
+      yield square unless square == []
+    end
   end
 
   def each_thing
-    @grid.each do |thing|
-      yield thing unless thing.nil?
+    @grid.each do |square|
+      square.each do |thing|
+        yield thing unless thing.nil?
+      end
     end
   end
 
@@ -209,15 +286,16 @@ class Map
     [[0,1], [1,0]].each do |c|
       if p0[c[0]]<p1[c[0]] then
         p0[c[0]].upto(p1[c[0]]-1)
-      else p0[c[0]].downto(p1[c[0]]+1)
+      else
+        p0[c[0]].downto(p1[c[0]]+1)
       end
       .each do |c0|
         c1 =  (((p1[c[1]]-p0[c[1]])*(c0-p0[c[0]])).fdiv(p1[c[0]]-p0[c[0]])+p0[c[1]]) #no divide-by-zero problem because x1.upto(x2-1) won't run anything if x1==x2
         if [[c0, c1.ceil], [c0, c1.floor]].all? do |e| #e for estimate
-          self[e[c[0]], e[c[1]]].blocks_vision?
-        end
+            self[e[c[0]], e[c[1]]].blocks_vision?
+          end
         then
-        return false
+          return false
         end
       end
     end
@@ -225,8 +303,8 @@ class Map
   end
 
   def display
-    self.each_thing do |t|
-      Termbox.tb_change_cell t.x, t.y, t.ch.ord, 4, 0
+    self.each_square do |s|
+      Termbox.tb_change_cell s.x, s.y, s.ch.ord, 4, 0
     end
   end
 
@@ -235,4 +313,3 @@ class Map
   end
 end
 
-# map files are just ruby files that declare a module with a MAP constant that is an instance of class
