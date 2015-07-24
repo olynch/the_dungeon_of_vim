@@ -30,8 +30,6 @@ module Maptest
   MAP[3,8] = Square.new [Key.new("door")]
   JOHN = Player.new([])
   MAP[2,2] = Square.new [JOHN]
-  puts("FIRST")
-  MAP.p_e
 end
 
 

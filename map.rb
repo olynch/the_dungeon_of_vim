@@ -95,28 +95,20 @@ class Player < Thing
       @old_map = Map.new(20, 10)
     end
 
-puts("I:")
-self.map.p_e
-
-    @old_map.each_square do |s|
-      if not self.visible? [s.x, s.y] then
-        Termbox.tb_change_cell s.x, s.y, s.ch.ord, 1, 0
-      else
-        @old_map[s.x, s.y] = Square.new
-      end
-    end
-
-puts("II:")
-self.map.p_e
+    #@old_map.each_square do |s|
+      #if not self.visible? [s.x, s.y] then
+        #Termbox.tb_change_cell s.x, s.y, s.ch.ord, 1, 0
+      #else
+        #@old_map[s.x, s.y] = Square.new
+      #end
+    #end
 
     self.map.each_square do |s|
-      if self.visible? [s.x, s.y] then
+      #if self.visible? [s.x, s.y] then
         Termbox.tb_change_cell s.x, s.y, s.ch.ord, 4, 0
-        @old_map << s.dup
-      end
+        #@old_map << s.dup
+      #end
     end
-puts("III:")
-self.map.p_e
   end
 
   def inspect
@@ -218,13 +210,11 @@ class Map
   def initialize(width, height, grid=nil)
     @width = width
     @height = height
-    @grid = grid || Array.new(width * height, Square.new)
+    @grid = grid || Array.new(width * height) {|_| Square.new}
     @grid.each.with_index do |square, i|
       square.map = self; square.x = i / height; square.y = i % height
       puts square.x
     end
-    puts("BEFORE_FIRST")
-    self.p_e
   end
 
   def [](x, y)
