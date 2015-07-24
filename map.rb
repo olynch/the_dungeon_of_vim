@@ -62,6 +62,9 @@ class Thing
   def collision!(p)
   end
 
+  def present(t)
+  end
+
   def show_priority
     0
   end
@@ -69,6 +72,13 @@ class Thing
   def move(dir, amt)
     self.map[self.x, self.y].delete(self)
     self.send dir + "=", (self.send dir) + amt
+    self.map << self
+  end
+
+  def move_to(x, y)
+    self.map[self.x, self.y].delete(self)
+    self.x = x
+    self.y = y
     self.map << self
   end
 
@@ -123,6 +133,24 @@ class Player < Thing
         s.each {|t| @old_map << t.dup}
       end
     end
+  end
+
+  def acton(t)
+    if t == self
+    elsif t.is_a? Key
+      self.take t
+    elsif t.is_a? Door
+      key = @inventory.find_object {|k| k.is_a?(Key) && k.door_name == t.name}
+      unless key.nil?
+        t.present key
+        @inventory.delete_first(key)
+      end
+    end
+  end
+
+  def take(t)
+    t.remove
+    self << t
   end
 
   def inspect
@@ -197,6 +225,12 @@ class Door < Thing
     end
   end
 
+  def present(t)
+    if t.is_a?(Key) && t.door_name == self.name
+      self.open = true
+    end
+  end
+
   def inspect
     "Door.new(#{@name}, #{@open})"
   end
@@ -210,7 +244,6 @@ class Map
     @grid = grid || Array.new(width * height) {|_| Square.new}
     @grid.each.with_index do |square, i|
       square.map = self; square.x = i / height; square.y = i % height
-      puts square.x
     end
   end
 
