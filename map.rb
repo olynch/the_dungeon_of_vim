@@ -62,6 +62,10 @@ class Thing
   def collision!(p)
   end
 
+  def show_priority
+    0
+  end
+
   def move(dir, amt)
     self.map[self.x, self.y].delete(self)
     self.send dir + "=", (self.send dir) + amt
@@ -86,6 +90,10 @@ class Player < Thing
 
   def <<(thing)
     @inventory.push(thing)
+  end
+
+  def show_priority
+    10
   end
 
   def ch

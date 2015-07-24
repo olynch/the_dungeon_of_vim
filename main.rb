@@ -3,31 +3,6 @@ require './maptest.rb'
 
 Termbox.initialize_library
 
-class Square < Array
-  def ch
-    self.reverse.max_by {|t| t.show_priority}.ch
-  end
-
-  def collision?
-    self.any? {|t| t.collision?}
-  end
-
-  def blocks_vision?
-    self.any? {|t| t.blocks_vision?}
-  end
-end
-
-class Thing
-  def show_priority
-    0
-  end
-end
-class Player
-  def show_priority
-    10
-  end
-end
-
 def parse_dun(fn)
   File.open(fn, ?r) do |f|
     return f.each_line.map do |ln|
