@@ -1,3 +1,5 @@
+require './helpers.rb'
+
 class Square < Array
   attr_accessor :x, :y, :map
   def ch
@@ -64,6 +66,10 @@ class Thing
     self.map[self.x, self.y].delete(self)
     self.send dir + "=", (self.send dir) + amt
     self.map << self
+  end
+
+  def remove
+    self.map[self.x, self.y].delete_first(self)
   end
 
   def inspect
@@ -148,6 +154,7 @@ class Key < Thing
   end
 
   def collision!(p)
+    self.remove
     p << self
   end
 
