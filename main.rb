@@ -1,3 +1,5 @@
+require './helpers.rb'
+require './display.rb'
 require 'termbox'
 require './maptest.rb'
 
@@ -17,7 +19,6 @@ def parse_dun(fn)
   end
 end
 
-$text = ""
 
 def keyboard_controls()
   ev = Termbox::Event.new
@@ -55,10 +56,7 @@ def keyboard_controls()
       Maptest::JOHN.move_to(ox, oy)
     end
   end
-end
-
-def text(str)
-  $text << str
+  #Maptest::MAP.each_thing {|t| t.update} #TODO: Make this a thing
 end
 
 #def move_enemy()
@@ -81,28 +79,9 @@ def win
   exit
 end
 
-def display()
-  Termbox.tb_clear
-  Maptest::JOHN.display
-  Termbox.tb_present
-end
-
-def disptext(y, x)
-  ox = x
-  $text.each_char.with_index do |c, i|
-    if c == ?\n then
-      y+=1
-      x = ox
-    else
-      Termbox.tb_change_cell x, y, c.ord, 1, 0
-      x+=1
-    end
-  end
-end
-
 def main()
-  text "hello, world\n"
-  display
+  Display::text "hello, world\n"
+  Display::display
   keyboard_controls
 end
 
