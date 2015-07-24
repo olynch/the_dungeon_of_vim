@@ -95,19 +95,19 @@ class Player < Thing
       @old_map = Map.new(20, 10)
     end
 
-    #@old_map.each_square do |s|
-      #if not self.visible? [s.x, s.y] then
-        #Termbox.tb_change_cell s.x, s.y, s.ch.ord, 1, 0
-      #else
-        #@old_map[s.x, s.y] = Square.new
-      #end
-    #end
+    @old_map.each_square do |s|
+      if not self.visible? [s.x, s.y] then
+        Termbox.tb_change_cell s.x, s.y, s.ch.ord, 1, 0
+      else
+        @old_map[s.x, s.y] = Square.new
+      end
+    end
 
     self.map.each_square do |s|
-      #if self.visible? [s.x, s.y] then
+      if self.visible? [s.x, s.y] then
         Termbox.tb_change_cell s.x, s.y, s.ch.ord, 4, 0
-        #@old_map << s.dup
-      #end
+        s.each {|t| @old_map << t.dup}
+      end
     end
   end
 
