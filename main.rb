@@ -17,8 +17,6 @@ def parse_dun(fn)
   end
 end
 
-$items = []
-
 $text = ""
 
 def keyboard_controls()
