@@ -116,24 +116,6 @@ class Player < Thing
   end
 end
 
-#class NilClass
-  #attr_accessor :x, :y, :map
-  #def ch
-    #' '
-  #end
-
-  #def collision?
-    #false
-  #end
-
-  #def blocks_vision?
-    #false
-  #end
-
-  #def collision!(p)
-  #end
-#end
-
 class Wall < Thing
   def initialize
   end
@@ -233,6 +215,11 @@ class Map
     square.x = x
     square.y = y
     @grid[x * @height + y] = square
+    if square.is_a? Square then
+      @grid[x * @height + y] = square
+    elsif square.is_a? Thing then
+      @grid[x * @height + y] << square
+    end
   end
 
   def <<(thing)
@@ -240,21 +227,10 @@ class Map
       return nil
     end
     thing.map = self
-    #old_thing = @grid[thing.x * @height + thing.y]
     if thing.is_a? Square then
       @grid[thing.x * @height + thing.y] = thing
     elsif thing.is_a? Thing then
       @grid[thing.x * @height + thing.y] << thing
-    end
-    #return old_thing
-  end
-
-  def p_e
-    @grid.each do |s|
-      print s.x
-      print ", "
-      print s.y
-      puts
     end
   end
 
