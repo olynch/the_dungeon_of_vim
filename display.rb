@@ -25,6 +25,16 @@ module Display
     Maptest::JOHN.display
     Termbox.tb_present
   end
+
+  #class Area
+    #attr_accessor :a, :b, :func
+    #def initialize
+    #end
+    #def update
+    #end
+    #def display
+    #end
+  #end
 end
 
 class Player
