@@ -3,7 +3,7 @@ require './map.rb'
 
 module Display
   @text = ""
-  def self.disptext(y, x)
+  def Display.disptext(y, x)
     ox = x
     @text.each_char.with_index do |c, i|
       if c == ?\n then
@@ -16,11 +16,11 @@ module Display
     end
   end
 
-  def self.text(str)
+  def Display.text(str)
     @text << str
   end
 
-  def self.display()
+  def Display.display()
     Termbox.tb_clear
     Maptest::JOHN.display
     Termbox.tb_present
