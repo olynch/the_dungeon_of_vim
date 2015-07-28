@@ -31,10 +31,6 @@ class Square < Array
     self.any? {|t| t.collision?}
   end
 
-  def collision!(p)
-    self.each {|t| t.collision! p}
-  end
-
   def map=(map)
     self.each {|t| t.map=map}
     @map = map
@@ -57,9 +53,6 @@ class Thing
 
   def blocks_vision?
     false
-  end
-
-  def collision!(p)
   end
 
   def present(t)
@@ -168,11 +161,6 @@ class Key < Thing
     ?Ƒ
   end
 
-  def collision!(p)
-    self.remove
-    p << self
-  end
-
   def inspect
     "Key.new(#{@door_name})"
   end
@@ -196,12 +184,6 @@ class Door < Thing
 
   def collision?
     !@open
-  end
-
-  def collision!(p)
-    if p.inventory.find_index {|k| k.is_a?(Key) && k.door_name == self.name}
-      self.open = true
-    end
   end
 
   def present(t)

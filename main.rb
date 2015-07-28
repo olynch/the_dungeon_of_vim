@@ -29,25 +29,13 @@ def keyboard_controls()
     when 0x1B
       exit
     when 0xFFFF-18
-      #Maptest::MAP[Maptest::JOHN.x, Maptest::JOHN.y-1].collision! Maptest::JOHN
-      #unless Maptest::MAP[Maptest::JOHN.x, Maptest::JOHN.y-1].collision? then
         Maptest::JOHN.move(?y, -1)
-      #end
     when 0xFFFF-19
-      #Maptest::MAP[Maptest::JOHN.x, Maptest::JOHN.y+1].collision! Maptest::JOHN
-      #unless Maptest::MAP[Maptest::JOHN.x, Maptest::JOHN.y+1].collision? then
         Maptest::JOHN.move(?y, 1)
-      #end
     when 0xFFFF-20
-      #Maptest::MAP[Maptest::JOHN.x-1, Maptest::JOHN.y].collision! Maptest::JOHN
-      #unless Maptest::MAP[Maptest::JOHN.x-1, Maptest::JOHN.y].collision? then
         Maptest::JOHN.move(?x, -1)
-      #end
     when 0xFFFF-21
-      #Maptest::MAP[Maptest::JOHN.x+1, Maptest::JOHN.y].collision! Maptest::JOHN
-      #unless Maptest::MAP[Maptest::JOHN.x+1, Maptest::JOHN.y].collision? then
         Maptest::JOHN.move(?x, 1)
-      #end
     end
     Maptest::MAP[Maptest::JOHN.x, Maptest::JOHN.y].each do |t|
       Maptest::JOHN.acton(t)
