@@ -26,15 +26,43 @@ module Display
     Termbox.tb_present
   end
 
-  #class Area
-    #attr_accessor :a, :b, :func
-    #def initialize
-    #end
+  class Area
+    attr_accessor :x1, :x2, :y1, :y2, :func, :type
+    def initialize(a, b, func, type)
+      @x0 = a[0]
+      @x1 = b[0]
+      @y0 = a[1]
+      @y1 = b[1]
+      @func = func
+      @type = type
+      @grid = Array.new
+    end
+
+    def a
+      [@x0, @y0]
+    end
+    def b
+      [@x1, @y1]
+    end
+    def a=(a)
+      @x0 = a[0]
+      @y0 = a[1]
+    end
+    def b=(b)
+      @x1 = b[0]
+      @y1 = b[1]
+    end
+
     #def update
     #end
-    #def display
-    #end
-  #end
+    def display
+      @func.call.each do |ch|
+        if @type == :clip then
+          Termbox.tb_change_cell ch.x+x1, ch.y+y1, ch.ord, ch.fg, ch.bg unless ch.x >= @x2-@x1 || ch.y >= @x2-@x1 || ch.x < 0 || ch.y < 0
+        end
+      end
+    end
+  end
 end
 
 class Player
