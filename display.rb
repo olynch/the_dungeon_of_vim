@@ -63,6 +63,22 @@ module Display
       end
     end
   end
+
+  class Char
+    attr_accessor :x, :y, :fg, :bg, :ch
+    def initialize(x, y, ch, fg, bg)
+      @x = x
+      @y = y
+      @ch = ch
+      @fg = fg
+      @bg = bg
+    end
+    def ord
+      @ch.ord
+    end
+    def display
+      Termbox.tb_change_cell @x, @y, @ch.ord, @fg, @bg
+    end
 end
 
 class Player
