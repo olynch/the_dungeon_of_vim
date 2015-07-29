@@ -22,9 +22,11 @@ module Display
 
   def Display.display()
     Termbox.tb_clear
-    Maptest::JOHN.display
+    AREAS.each {|a| a.display}
     Termbox.tb_present
   end
+
+  AREAS=[]
 
   class Area
     attr_accessor :x1, :x2, :y1, :y2, :func, :type
@@ -58,7 +60,7 @@ module Display
     def display
       @func.call.each do |ch|
         if @type == :clip then
-          Termbox.tb_change_cell ch.x+x1, ch.y+y1, ch.ord, ch.fg, ch.bg unless ch.x >= @x2-@x1 || ch.y >= @x2-@x1 || ch.x < 0 || ch.y < 0
+          Termbox.tb_change_cell ch.x+@x0, ch.y+@y0, ch.ord, ch.fg, ch.bg unless ch.x >= @x1-@x0 || ch.y >= @y1-@y0 || ch.x < 0 || ch.y < 0
         end
       end
     end
@@ -79,9 +81,33 @@ module Display
     def display
       Termbox.tb_change_cell @x, @y, @ch.ord, @fg, @bg
     end
+  end
 end
 
 class Player
+  def areaFunc
+    ret = []
+    if @old_map.nil? then
+      @old_map = Map.new(20, 10)
+    end
+
+    @old_map.each_square do |s|
+      if not self.visible? [s.x, s.y] then
+        ret << Display::Char.new(s.x, s.y, s.ch.ord, 1, 0)
+      else
+        @old_map[s.x, s.y] = Square.new
+      end
+    end
+
+    self.map.each_square do |s|
+      if self.visible? [s.x, s.y] then
+        ret << Display::Char.new(s.x, s.y, s.ch.ord, 4, 0)
+        s.each {|t| @old_map << t.dup}
+      end
+    end
+    return ret
+  end
+
   def display
     if @old_map.nil? then
       @old_map = Map.new(20, 10)
@@ -109,5 +135,13 @@ class Map
     self.each_square do |s|
       Termbox.tb_change_cell s.x, s.y, s.ch.ord, 4, 0
     end
+  end
+
+  def areaFunc
+    ret=[]
+    self.each_square do |s|
+      ret << Display::Char.new(s.x, s.y, s.ch.ord, 4, 0)
+    end
+    return ret
   end
 end
