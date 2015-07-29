@@ -68,15 +68,15 @@ def win
 end
 
 def main()
-  Display.text << "hello, world\n"
+  Display.text << "#{Maptest::JOHN.x}, #{Maptest::JOHN.y}\n"
   Display::display
   keyboard_controls
 end
 
 begin
   Termbox.tb_init
-  Display::AREAS << Display::Area.new([10,1], [15,11], Maptest::JOHN.method("areaFunc"), :clip)
-  Display::AREAS << Display::Area.new([20,20], [40,30], Maptest::MAP.method("areaFunc"), :clip)
+  Display::AREAS << Display::Area.new([10,1], [15,11], Maptest::JOHN.method("disp"), :clip)
+  Display::AREAS << Display::Area.new([20,20], [40,30], Maptest::MAP.method("disp"), :clip)
   Display::AREAS << Display::Area.new([50,1], [100,50], proc {Display.text.disp}, :clip)
   loop do
     main

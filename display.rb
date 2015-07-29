@@ -84,7 +84,7 @@ class Char
 end
 
 class Player
-  def areaFunc
+  def disp
     ret = []
     if @old_map.nil? then
       @old_map = Map.new(20, 10)
@@ -105,27 +105,6 @@ class Player
       end
     end
     return ret
-  end
-
-  def display
-    if @old_map.nil? then
-      @old_map = Map.new(20, 10)
-    end
-
-    @old_map.each_square do |s|
-      if not self.visible? [s.x, s.y] then
-        Termbox.tb_change_cell s.x, s.y, s.ch.ord, 1, 0
-      else
-        @old_map[s.x, s.y] = Square.new
-      end
-    end
-
-    self.map.each_square do |s|
-      if self.visible? [s.x, s.y] then
-        Termbox.tb_change_cell s.x, s.y, s.ch.ord, 4, 0
-        s.each {|t| @old_map << t.dup}
-      end
-    end
   end
 end
 
@@ -149,13 +128,7 @@ class String
 end
 
 class Map
-  def display
-    self.each_square do |s|
-      Termbox.tb_change_cell s.x, s.y, s.ch.ord, 4, 0
-    end
-  end
-
-  def areaFunc
+  def disp
     ret=[]
     self.each_square do |s|
       ret << Char.new(s.x, s.y, s.ch.ord, 4, 0)
