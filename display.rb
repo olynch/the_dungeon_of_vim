@@ -75,6 +75,23 @@ module Display
     end
   end
 
+  class String
+    def disp
+      x=0
+      y=0
+      String.each_char do |c|
+        case c
+        when ?\n
+          y+=1
+          x=0
+        else
+          ret << Char.new(x, y, c.ord, 0, 0)
+          x+=1
+        end
+      end
+      return ret
+    end
+
   class Char
     attr_accessor :x, :y, :fg, :bg, :ch
     def initialize(x, y, ch, fg, bg)
