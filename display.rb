@@ -58,6 +58,15 @@ module Display
     #def update
     #end
     def display
+      borderColor=7
+      (@x0-1).upto(@x1) do |x|
+        Termbox.tb_change_cell x, @y0-1, ' '.ord, 0, borderColor
+        Termbox.tb_change_cell x, @y1, ' '.ord, 0, borderColor
+      end
+      (@y0-1).upto(@y1) do |y|
+        Termbox.tb_change_cell @x0-1, y, ' '.ord, 0, borderColor
+        Termbox.tb_change_cell @x1, y, ' '.ord, 0, borderColor
+      end
       @func.call.each do |ch|
         if @type == :clip then
           Termbox.tb_change_cell ch.x+@x0, ch.y+@y0, ch.ord, ch.fg, ch.bg unless ch.x >= @x1-@x0 || ch.y >= @y1-@y0 || ch.x < 0 || ch.y < 0

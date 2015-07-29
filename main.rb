@@ -75,8 +75,8 @@ end
 
 begin
   Termbox.tb_init
-  Display::AREAS << Display::Area.new([10,0], [15,20], Maptest::JOHN.method("areaFunc"), :clip)
-  Display::AREAS << Display::Area.new([20,20], [40,40], Maptest::MAP.method("areaFunc"), :clip)
+  Display::AREAS << Display::Area.new([10,1], [15,11], Maptest::JOHN.method("areaFunc"), :clip)
+  Display::AREAS << Display::Area.new([20,20], [40,30], Maptest::MAP.method("areaFunc"), :clip)
   loop do
     main
   end
