@@ -3,21 +3,11 @@ require './map.rb'
 
 module Display
   @text = ""
-  def Display.disptext(y, x)
-    ox = x
-    @text.each_char.with_index do |c, i|
-      if c == ?\n then
-        y+=1
-        x = ox
-      else
-        Termbox.tb_change_cell x, y, c.ord, 1, 0
-        x+=1
-      end
-    end
+  def Display.text
+    @text
   end
-
-  def Display.text(str)
-    @text << str
+  def Display.text=(t)
+    @text=t
   end
 
   def Display.display()
@@ -74,39 +64,22 @@ module Display
       end
     end
   end
+end
 
-  class String
-    def disp
-      x=0
-      y=0
-      String.each_char do |c|
-        case c
-        when ?\n
-          y+=1
-          x=0
-        else
-          ret << Char.new(x, y, c.ord, 0, 0)
-          x+=1
-        end
-      end
-      return ret
-    end
-
-  class Char
-    attr_accessor :x, :y, :fg, :bg, :ch
-    def initialize(x, y, ch, fg, bg)
-      @x = x
-      @y = y
-      @ch = ch
-      @fg = fg
-      @bg = bg
-    end
-    def ord
-      @ch.ord
-    end
-    def display
-      Termbox.tb_change_cell @x, @y, @ch.ord, @fg, @bg
-    end
+class Char
+  attr_accessor :x, :y, :fg, :bg, :ch
+  def initialize(x, y, ch, fg, bg)
+    @x = x
+    @y = y
+    @ch = ch
+    @fg = fg
+    @bg = bg
+  end
+  def ord
+    @ch.ord
+  end
+  def display
+    Termbox.tb_change_cell @x, @y, @ch.ord, @fg, @bg
   end
 end
 
@@ -119,7 +92,7 @@ class Player
 
     @old_map.each_square do |s|
       if not self.visible? [s.x, s.y] then
-        ret << Display::Char.new(s.x, s.y, s.ch.ord, 1, 0)
+        ret << Char.new(s.x, s.y, s.ch.ord, 1, 0)
       else
         @old_map[s.x, s.y] = Square.new
       end
@@ -127,7 +100,7 @@ class Player
 
     self.map.each_square do |s|
       if self.visible? [s.x, s.y] then
-        ret << Display::Char.new(s.x, s.y, s.ch.ord, 4, 0)
+        ret << Char.new(s.x, s.y, s.ch.ord, 4, 0)
         s.each {|t| @old_map << t.dup}
       end
     end
@@ -156,6 +129,25 @@ class Player
   end
 end
 
+class String
+  def disp
+    ret=[]
+    x=0
+    y=0
+    self.each_char do |c|
+      case c
+      when ?\n
+        y+=1
+        x=0
+      else
+        ret << Char.new(x, y, c.ord, 0, 0)
+        x+=1
+      end
+    end
+    return ret
+  end
+end
+
 class Map
   def display
     self.each_square do |s|
@@ -166,7 +158,7 @@ class Map
   def areaFunc
     ret=[]
     self.each_square do |s|
-      ret << Display::Char.new(s.x, s.y, s.ch.ord, 4, 0)
+      ret << Char.new(s.x, s.y, s.ch.ord, 4, 0)
     end
     return ret
   end
