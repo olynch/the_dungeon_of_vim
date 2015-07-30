@@ -18,4 +18,26 @@ class Array
       end
     end
   end
+
+  def partition
+    ret = []
+    yret = []
+    self.each do |x|
+      yx = yield x
+      if not
+        yret.map.with_index do |r, i|
+          if r == yx
+            ret[i] << x
+            true
+          else
+            false
+          end
+        end.any?
+      then
+        ret << [x]
+        yret << yx
+      end
+    end
+    return ret
+  end
 end
