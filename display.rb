@@ -1,4 +1,5 @@
 require 'termbox'
+require './helpers.rb'
 require './map.rb'
 
 module Display
@@ -17,6 +18,50 @@ module Display
   end
 
   AREAS=[]
+
+  class NewArea
+    attr_accessor :x, :y, :func
+    def initialize(x, y, func, type)
+      @x = x
+      @y = y
+      @func = func
+    end
+
+    def display
+      @func.call.each do |ch|
+          Termbox.tb_change_cell ch.x+@x0, ch.y+@y0, ch.ord, ch.fg, ch.bg
+      end
+    end
+  end
+
+  module BoundedArea
+    #requires
+    #self.interior
+    #or
+    #self.border
+    def border
+      ret = []
+      interior = self.interior
+      interior.map do |p|
+        p.neighborhood do |n|
+          ret << n unless interior.includes? n
+        end
+      end
+    end
+
+    def interior
+      self.border.partition {|p| p[0]}.flat_map do |p|
+        p.sort {|a, b| a[1] <=> b[1]}
+        .each_slice(2).map do |ps|
+          if ps.length == 1
+            []
+          else
+            (ps[0][1]+1).upto(ps[1][1]-1).map {|y| [ps[0][0], y]}
+          end
+        end
+      end
+    end
+  end
 
   class Area
     attr_accessor :x1, :x2, :y1, :y2, :func, :type
