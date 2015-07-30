@@ -17,6 +17,7 @@ class Array
         ret << [self[0]+i, self[1]+j]
       end
     end
+    return ret
   end
 
   def partition
