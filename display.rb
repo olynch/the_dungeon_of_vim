@@ -42,17 +42,18 @@ module Display
     def border
       ret = []
       interior = self.interior
-      interior.map do |p|
-        p.neighborhood do |n|
-          ret << n unless interior.includes? n
+      interior.each do |p|
+        p.neighborhood.each do |n|
+          ret << n unless interior.include? n
         end
       end
+      return ret
     end
 
     def interior
       self.border.partition {|p| p[0]}.flat_map do |p|
         p.sort {|a, b| a[1] <=> b[1]}
-        .each_slice(2).map do |ps|
+        .each_slice(2).flat_map do |ps|
           if ps.length == 1
             []
           else
