@@ -69,6 +69,10 @@ module Display
       end
     end
 
+    def interior?(p)
+      interior.include?(p)
+    end
+
     def display
       self.borderDisp.each do |ch|
         Termbox.tb_change_cell ch.x, ch.y, ch.ord, ch.fg, ch.bg
@@ -93,7 +97,7 @@ module Display
 
     def display
       @func.call.each do |ch|
-          Termbox.tb_change_cell ch.x+@x, ch.y+@y, ch.ord, ch.fg, ch.bg if self.interior.include? [ch.x+@x, ch.y+@y]
+          Termbox.tb_change_cell ch.x+@x, ch.y+@y, ch.ord, ch.fg, ch.bg if self.interior? [ch.x+@x, ch.y+@y]
       end
       super
     end
