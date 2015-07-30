@@ -21,7 +21,7 @@ module Display
 
   class NewArea
     attr_accessor :x, :y, :func
-    def initialize(x, y, func, type)
+    def initialize(x, y, func)
       @x = x
       @y = y
       @func = func
@@ -29,12 +29,12 @@ module Display
 
     def display
       @func.call.each do |ch|
-          Termbox.tb_change_cell ch.x+@x0, ch.y+@y0, ch.ord, ch.fg, ch.bg
+          Termbox.tb_change_cell ch.x+@x, ch.y+@y, ch.ord, ch.fg, ch.bg
       end
     end
   end
 
-  module BoundedArea
+  module Bounded
     #requires
     #self.interior
     #or
@@ -50,6 +50,12 @@ module Display
       return ret
     end
 
+    def borderDisp
+      border.map do |p|
+        Char.new(p[0], p[1], ' '.ord, 0, 7)
+      end
+    end
+
     def interior
       self.border.partition {|p| p[0]}.flat_map do |p|
         p.sort {|a, b| a[1] <=> b[1]}
@@ -61,6 +67,35 @@ module Display
           end
         end
       end
+    end
+
+    def display
+      self.borderDisp.each do |ch|
+        Termbox.tb_change_cell ch.x, ch.y, ch.ord, ch.fg, ch.bg
+      end
+    end
+  end
+
+  class BoundedArea < NewArea
+    include Bounded
+    attr_writer :border, :interior
+    def initialize(x, y, func, border: nil, interior: nil)
+      super x, y, func
+      @border = border
+      @interior = interior
+    end
+    def border
+      @border || super
+    end
+    def interior
+      @interior || super
+    end
+
+    def display
+      @func.call.each do |ch|
+          Termbox.tb_change_cell ch.x+@x, ch.y+@y, ch.ord, ch.fg, ch.bg if self.interior.include? [ch.x+@x, ch.y+@y]
+      end
+      super
     end
   end
 

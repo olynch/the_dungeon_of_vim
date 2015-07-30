@@ -75,9 +75,10 @@ end
 
 begin
   Termbox.tb_init
-  Display::AREAS << Display::Area.new([10,1], [15,11], Maptest::JOHN.method("disp"), :clip)
-  Display::AREAS << Display::Area.new([20,20], [40,30], Maptest::MAP.method("disp"), :clip)
-  Display::AREAS << Display::Area.new([50,1], [100,50], proc {Display.text.disp}, :clip)
+  #Display::AREAS << Display::Area.new([10,1], [15,11], Maptest::JOHN.method("disp"), :clip)
+  #Display::AREAS << Display::Area.new([20,20], [40,30], Maptest::MAP.method("disp"), :clip)
+  #Display::AREAS << Display::Area.new([50,1], [100,50], proc {Display.text.disp}, :clip)
+  Display::AREAS << Display::BoundedArea.new(2, 2, proc {Display.text.disp}, border: (1..10).flat_map {|i| [[i,1], [1,i], [10,i], [i,10]]}.uniq)
   loop do
     main
   end
