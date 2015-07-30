@@ -75,7 +75,7 @@ module Display
 
     def display
       self.borderDisp.each do |ch|
-        Termbox.tb_change_cell ch.x, ch.y, ch.ord, ch.fg, ch.bg
+        Termbox.tb_change_cell ch.x+@x, ch.y+@y, ch.ord, ch.fg, ch.bg
       end
     end
   end
@@ -84,11 +84,12 @@ module Display
     include Bounded
     def display
       @func.call.each do |ch|
-          Termbox.tb_change_cell ch.x+@x, ch.y+@y, ch.ord, ch.fg, ch.bg if self.interior? [ch.x+@x, ch.y+@y]
+          Termbox.tb_change_cell ch.x+@x, ch.y+@y, ch.ord, ch.fg, ch.bg if self.interior? [ch.x, ch.y]
       end
       super
     end
   end
+#TODO: MAYBE ADD A METHOD TO AREA THAT JUST RUNS @FUNC.CALL SO THAT WE CAN ADD DIFFERENT WAYS OF INTERPRETING THE DATA FROM @FUNC (LIKE TAIL)
 
   class ClipArea < NewArea
     include Clip
