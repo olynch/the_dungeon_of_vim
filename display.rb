@@ -80,26 +80,31 @@ module Display
     end
   end
 
-  class BoundedArea < NewArea
+  module Clip
     include Bounded
+    def display
+      @func.call.each do |ch|
+          Termbox.tb_change_cell ch.x+@x, ch.y+@y, ch.ord, ch.fg, ch.bg if self.interior? [ch.x+@x, ch.y+@y]
+      end
+      super
+    end
+  end
+
+  class ClipArea < NewArea
+    include Clip
     attr_writer :border, :interior
     def initialize(x, y, func, border: nil, interior: nil)
       super x, y, func
       @border = border
       @interior = interior
     end
+
     def border
       @border || super
     end
+
     def interior
       @interior || super
-    end
-
-    def display
-      @func.call.each do |ch|
-          Termbox.tb_change_cell ch.x+@x, ch.y+@y, ch.ord, ch.fg, ch.bg if self.interior? [ch.x+@x, ch.y+@y]
-      end
-      super
     end
   end
 
