@@ -83,10 +83,10 @@ module Display
   module Clip
     include Bounded
     def display
+      super
       @func.call.each do |ch|
           Termbox.tb_change_cell ch.x+@x, ch.y+@y, ch.ord, ch.fg, ch.bg if self.interior? [ch.x, ch.y]
       end
-      super
     end
   end
 #TODO: MAYBE ADD A METHOD TO AREA THAT JUST RUNS @FUNC.CALL SO THAT WE CAN ADD DIFFERENT WAYS OF INTERPRETING THE DATA FROM @FUNC (LIKE TAIL)
@@ -94,6 +94,7 @@ module Display
     #requires that @func only returns Chars at positive coordinates
     include Bounded
     def display
+      super
       grid=[]
       rows=0
       @func.call.partition {|ch| ch.y}.each do |p| p.each do |ch|
@@ -113,10 +114,15 @@ module Display
     end
   end
 
-  class WrapArea < NewArea
-    include Wrap
+  class BoundedArea < NewArea
     attr_writer :border, :interior
-    def initialize(x, y, func, border: nil, interior: nil)
+    include Bounded
+    def initialize(x, y, func, type, border: nil, interior: nil)
+      if type == :wrap
+        self.extend Wrap
+      elsif type == :clip
+        self.extend Clip
+      end
       super x, y, func
       @border = border
       @interior = interior
