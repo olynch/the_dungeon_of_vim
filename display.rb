@@ -90,9 +90,31 @@ module Display
     end
   end
 #TODO: MAYBE ADD A METHOD TO AREA THAT JUST RUNS @FUNC.CALL SO THAT WE CAN ADD DIFFERENT WAYS OF INTERPRETING THE DATA FROM @FUNC (LIKE TAIL)
+  module Wrap
+    #requires that @func only returns Chars at positive coordinates
+    include Bounded
+    def display
+      grid=[]
+      rows=0
+      @func.call.partition {|ch| ch.y}.each do |p| p.each do |ch|
+          if self.interior? [ch.x, ch.y+rows]
+            Termbox.tb_change_cell ch.x+@x, ch.y+@y+rows, ch.ord, ch.fg, ch.bg
+          else
+            limit = self.interior.select {|p| p[1] == ch.y+rows}.max {|p| p[0]}
+            if limit.nil? then return end
+            p.each do |och|
+              och.x -= limit[0]
+            end
+            rows += 1
+            redo
+          end
+        end
+      end
+    end
+  end
 
-  class ClipArea < NewArea
-    include Clip
+  class WrapArea < NewArea
+    include Wrap
     attr_writer :border, :interior
     def initialize(x, y, func, border: nil, interior: nil)
       super x, y, func
