@@ -13,18 +13,19 @@ module Display
 
   def Display.display()
     Termbox.tb_clear
-    AREAS.each {|a| a.display}
+    AREAS.each {|a| a.display; a.sudo_display}
     Termbox.tb_present
   end
 
   AREAS=[]
 
   class NewArea
-    attr_accessor :x, :y, :func
-    def initialize(x, y, func)
+    attr_accessor :x, :y, :func, :sudo_func
+    def initialize(x, y, func, sudo_func=proc{[]})
       @x = x
       @y = y
       @func = func
+      @sudo_func = sudo_func
     end
 
     def display
@@ -32,18 +33,38 @@ module Display
         Termbox.tb_change_cell ch.x+@x, ch.y+@y, ch.ord, ch.fg, ch.bg
       end
     end
+
+    def sudo_display
+      @sudo_func.call.each do |ch|
+        Termbox.tb_change_cell ch.x+@x, ch.y+@y, ch.ord, ch.fg, ch.bg
+      end
+    end
+  end
+
+  module DisplayBorder
+    def self.extended(base)
+      tempfunc = base.sudo_func
+      base.sudo_func = proc {tempfunc.call | base.borderDisp}
+    end
+
+    def borderDisp
+      border.map do |p|
+        Char.new(p[0], p[1], ' '.ord, 0, 7)
+      end
+    end
   end
 
   class AreaBounded < NewArea
     attr_writer :border, :interior
-    def initialize(x, y, func, type, border: nil, interior: nil)
+    def initialize(x, y, func, border: nil, interior: nil)
       super x, y, func
       @border = border
       @interior = interior
+      self.extend DisplayBorder
     end
 
     def border
-      @border || Proc do
+      @border || proc do
         ret = []
         interior = self.interior
         interior.each do |p|
@@ -76,21 +97,6 @@ module Display
     def display
       @func.call.each do |ch|
         Termbox.tb_change_cell ch.x+@x, ch.y+@y, ch.ord, ch.fg, ch.bg if self.interior? [ch.x, ch.y]
-      end
-    end
-  end
-
-  module DisplayBorder
-    def borderDisp
-      border.map do |p|
-        Char.new(p[0], p[1], ' '.ord, 0, 7)
-      end
-    end
-
-    def display
-      super
-      self.borderDisp.each do |ch|
-        Termbox.tb_change_cell ch.x+@x, ch.y+@y, ch.ord, ch.fg, ch.bg
       end
     end
   end
