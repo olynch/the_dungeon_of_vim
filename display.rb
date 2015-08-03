@@ -29,35 +29,35 @@ module Display
 
     def display
       @func.call.each do |ch|
-          Termbox.tb_change_cell ch.x+@x, ch.y+@y, ch.ord, ch.fg, ch.bg
+        Termbox.tb_change_cell ch.x+@x, ch.y+@y, ch.ord, ch.fg, ch.bg
       end
     end
   end
 
-  module Bounded
-    #requires
-    #self.interior
-    #or
-    #self.border
-    def border
-      ret = []
-      interior = self.interior
-      interior.each do |p|
-        p.neighborhood.each do |n|
-          ret << n unless interior.include? n
-        end
-      end
-      return ret
+  class AreaBounded < NewArea
+    attr_writer :border, :interior
+    def initialize(x, y, func, type, border: nil, interior: nil)
+      super x, y, func
+      @border = border
+      @interior = interior
     end
 
-    def borderDisp
-      border.map do |p|
-        Char.new(p[0], p[1], ' '.ord, 0, 7)
+    def border
+      @border || Proc do
+        ret = []
+        interior = self.interior
+        interior.each do |p|
+          p.neighborhood.each do |n|
+            ret << n unless interior.include? n
+          end
+        end
+        return ret
       end
     end
 
     def interior
-      self.border.partition {|p| p[0]}.flat_map do |p|
+      @interior ||
+        self.border.partition {|p| p[0]}.flat_map do |p|
         p.sort {|a, b| a[1] <=> b[1]}
         .each_slice(2).flat_map do |ps|
           if ps.length == 1
@@ -74,66 +74,48 @@ module Display
     end
 
     def display
+      @func.call.each do |ch|
+        Termbox.tb_change_cell ch.x+@x, ch.y+@y, ch.ord, ch.fg, ch.bg if self.interior? [ch.x, ch.y]
+      end
+    end
+  end
+
+  module DisplayBorder
+    def borderDisp
+      border.map do |p|
+        Char.new(p[0], p[1], ' '.ord, 0, 7)
+      end
+    end
+
+    def display
+      super
       self.borderDisp.each do |ch|
         Termbox.tb_change_cell ch.x+@x, ch.y+@y, ch.ord, ch.fg, ch.bg
       end
     end
   end
 
-  module Clip
-    include Bounded
-    def display
-      super
-      @func.call.each do |ch|
-          Termbox.tb_change_cell ch.x+@x, ch.y+@y, ch.ord, ch.fg, ch.bg if self.interior? [ch.x, ch.y]
-      end
-    end
-  end
-#TODO: MAYBE ADD A METHOD TO AREA THAT JUST RUNS @FUNC.CALL SO THAT WE CAN ADD DIFFERENT WAYS OF INTERPRETING THE DATA FROM @FUNC (LIKE TAIL)
-  module Wrap
+  #TODO: MAYBE ADD A METHOD TO AREA THAT JUST RUNS @FUNC.CALL SO THAT WE CAN ADD DIFFERENT WAYS OF INTERPRETING THE DATA FROM @FUNC (LIKE TAIL)
+
+  class AreaWrap < AreaBounded
     #requires that @func only returns Chars at positive coordinates
-    include Bounded
     def display
-      super
       grid=[]
       rows=0
       @func.call.partition {|ch| ch.y}.each do |p| p.each do |ch|
-          if self.interior? [ch.x, ch.y+rows]
-            Termbox.tb_change_cell ch.x+@x, ch.y+@y+rows, ch.ord, ch.fg, ch.bg
-          else
-            limit = self.interior.select {|p| p[1] == ch.y+rows}.max {|p| p[0]}
-            if limit.nil? then return end
-            p.each do |och|
-              och.x -= limit[0]
-            end
-            rows += 1
-            redo
+        if self.interior? [ch.x, ch.y+rows]
+          Termbox.tb_change_cell ch.x+@x, ch.y+@y+rows, ch.ord, ch.fg, ch.bg
+        else
+          limit = self.interior.select {|p| p[1] == ch.y+rows}.max {|p| p[0]}
+          if limit.nil? then return end
+          p.each do |och|
+            och.x -= limit[0]
           end
+          rows += 1
+          redo
         end
       end
-    end
-  end
-
-  class BoundedArea < NewArea
-    attr_writer :border, :interior
-    include Bounded
-    def initialize(x, y, func, type, border: nil, interior: nil)
-      if type == :wrap
-        self.extend Wrap
-      elsif type == :clip
-        self.extend Clip
       end
-      super x, y, func
-      @border = border
-      @interior = interior
-    end
-
-    def border
-      @border || super
-    end
-
-    def interior
-      @interior || super
     end
   end
 
