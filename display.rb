@@ -139,11 +139,11 @@ module Display
     def a=(a)
       @a = a
       @x = a[0]
+      @y = a[1]
     end
 
     def b=(b)
       @b = b
-      @y = b[0]
     end
 
     def h
