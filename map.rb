@@ -82,6 +82,9 @@ class Thing
   def inspect
     "Thing.new"
   end
+
+  def update
+  end
 end
 
 class Player < Thing
