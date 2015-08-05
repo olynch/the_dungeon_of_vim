@@ -1,4 +1,3 @@
-require 'pry.rb'
 class Array
   def delete_first(obj)
     self.delete_at(self.index(obj))
@@ -50,4 +49,3 @@ class Array
     return ret
   end
 end
-binding.pry
