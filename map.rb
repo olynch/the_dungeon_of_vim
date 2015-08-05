@@ -270,12 +270,14 @@ class Map
   end
 
   def each_square
+    enum_func
     @grid.each do |square|
       yield square unless square == []
     end
   end
 
   def each_thing
+    enum_func
     @grid.each do |square|
       square.each do |thing|
         yield thing unless thing.nil?
