@@ -1,3 +1,4 @@
+require 'pry.rb'
 class Array
   def delete_first(obj)
     self.delete_at(self.index(obj))
@@ -17,6 +18,13 @@ class Array
         ret << [self[0]+i, self[1]+j]
       end
     end
+    return ret
+  end
+
+  def move(dir, amt)
+    ret = self.dup
+    a = (dir == 'x' ? 0 : 1)
+    ret[a]+=amt
     return ret
   end
 
@@ -42,3 +50,4 @@ class Array
     return ret
   end
 end
+binding.pry
