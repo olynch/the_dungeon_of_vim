@@ -23,25 +23,22 @@ end
 def keyboard_controls()
   ev = Termbox::Event.new
   if Termbox.tb_poll_event(ev) >= 0 && ev[:type] == 1 then
-    ox = Maptest::JOHN.x
-    oy = Maptest::JOHN.y
     case ev[:key]
     when 0x1B
       exit
     when 0xFFFF-18
-        Maptest::JOHN.move(?y, -1)
+      where = [?y, -1]
     when 0xFFFF-19
-        Maptest::JOHN.move(?y, 1)
+      where = [?y, 1]
     when 0xFFFF-20
-        Maptest::JOHN.move(?x, -1)
+      where = [?x, -1]
     when 0xFFFF-21
-        Maptest::JOHN.move(?x, 1)
+      where = [?x, 1]
     end
-    Maptest::MAP[Maptest::JOHN.x, Maptest::JOHN.y].each do |t|
+    whereto = [Maptest::JOHN.x, Maptest::JOHN.y].move(*where)
+    Maptest::JOHN.move(*where) unless Maptest::MAP[*whereto].collision?
+    Maptest::MAP[*whereto].each do |t|
       Maptest::JOHN.acton(t)
-    end
-    if Maptest::MAP[Maptest::JOHN.x, Maptest::JOHN.y].collision?
-      Maptest::JOHN.move_to(ox, oy)
     end
   end
   Maptest::MAP.each_thing.eager {|t| t.update} #TODO: Make this a thing
