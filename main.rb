@@ -47,22 +47,6 @@ def keyboard_controls()
   Maptest::MAP.each_thing.eager {|t| t.update} #TODO: Make this a thing
 end
 
-#def move_enemy()
-  #buffer = []
-  #buffer = $map.map { |x| x.map {|y| y}}
-  #$map.each_index do |y|
-    #$map[y].each_index do |x|
-      #if $map[y][x] == ?e then
-        #buffer[y][x] = nil
-        #ev = ["[y-1][x]", "[y][x-1]", "[y][x]", "[y+1][x]", "[y][x+1]"].map {|x| "buffer" + x}
-        #ev.keep_if { |a| (eval a).nil? }
-        #eval (ev.sample + " = ?e")
-      #end
-    #end
-  #end
-  #$map = buffer
-#end
-
 def win
   exit
 end
