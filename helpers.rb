@@ -1,3 +1,17 @@
+require 'binding_of_caller'
+
+module Hacks
+  def self.caller_object
+    binding.of_caller(2).eval('self')
+  end
+end
+
+class Object
+  def enum_func
+    binding.of_caller(1).eval('return enum_for(__method__) unless block_given?')
+  end
+end
+
 class Array
   def delete_first(obj)
     self.delete_at(self.index(obj))
