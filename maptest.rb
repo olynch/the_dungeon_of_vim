@@ -25,7 +25,7 @@ module Maptest
     MAP[i+9, 9] = Square.new [Wall.new]
     MAP[19, i] = Square.new [Wall.new]
   end
-  MAP[5,5] = Square.new
+  MAP[5,5] = Square.new [Enemy.new]
   MAP[9,6] = Square.new [Door.new("door")]
   MAP[3,8] = Square.new [Key.new("door")]
   JOHN = Player.new([])

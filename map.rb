@@ -133,6 +133,29 @@ class Player < Thing
   end
 end
 
+class Enemy < Thing
+  def show_priority
+    9
+  end
+
+  def ch
+    ?☹
+  end
+
+  def blocks_vision?
+    false
+  end
+
+  def inspect
+    "Enemy.new"
+  end
+
+  def update
+    where = [["x","y"].sample, [-1,1].sample]
+    self.move(*where) unless self.map[*[self.x, self.y].move(*where)].collision?
+  end
+end
+
 class Wall < Thing
   def initialize
   end
