@@ -133,6 +133,7 @@ class Player < Thing
   end
 end
 
+#TODO: maybe have common superclass of Player and Enemy? self.visible? may prove useful
 class Enemy < Thing
   def show_priority
     9
@@ -222,6 +223,13 @@ class Door < Thing
     "Door.new(#{@name}, #{@open})"
   end
 end
+
+class DoorHidden < Door
+  def ch
+    if @open then ?¦ else ?# end
+  end
+end
+
 
 class Map
   attr_accessor :width, :height
