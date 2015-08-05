@@ -44,7 +44,7 @@ def keyboard_controls()
       Maptest::JOHN.move_to(ox, oy)
     end
   end
-  Maptest::MAP.each_thing {|t| t.update} #TODO: Make this a thing
+  Maptest::MAP.each_thing.eager {|t| t.update} #TODO: Make this a thing
 end
 
 #def move_enemy()

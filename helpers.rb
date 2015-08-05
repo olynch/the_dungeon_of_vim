@@ -12,6 +12,15 @@ class Object
   end
 end
 
+module Enumerable
+  def eager
+    enum_func
+    self.to_a.each do |a|
+      yield a
+    end
+  end
+end
+
 class Array
   def delete_first(obj)
     self.delete_at(self.index(obj))
