@@ -133,7 +133,6 @@ module Display
       @b = b
       @border = border
       @interior = interior
-      self.extend DisplayBorder if dispBorder
     end
 
     def a=(a)
@@ -158,6 +157,14 @@ module Display
       ((-1..w).flat_map {|i| [[i, -1], [i, h]]} |
        (-1..h).flat_map {|i| [[-1, i], [w, i]]} )
       .uniq
+    end
+
+    def interior
+      (0..w-1).to_a.product (0..h-1).to_a
+    end
+
+    def interior?(xy)
+      xy[0] >= 0 && xy[0] < w && xy[1] >= 0 && xy[1] < w
     end
   end
 end
