@@ -43,7 +43,7 @@ module Display
 
   module DisplayBorder
     def self.extended(base)
-      tempfunc = base.sudo_func
+      tempfunc = base.sudo_func #TODO: This is ugly. Make it not ugly.
       base.sudo_func = proc {tempfunc.call | base.borderDisp}
     end
 
@@ -103,7 +103,7 @@ module Display
 
   #TODO: MAYBE ADD A METHOD TO AREA THAT JUST RUNS @FUNC.CALL SO THAT WE CAN ADD DIFFERENT WAYS OF INTERPRETING THE DATA FROM @FUNC (LIKE TAIL)
 
-  class AreaWrap < AreaBounded
+  module AreaWrap
     #requires that @func only returns Chars at positive coordinates
     def display
       grid=[]
