@@ -10,6 +10,10 @@ class Object
   def enum_func
     binding.of_caller(1).eval('return enum_for(__method__) unless block_given?')
   end
+
+  def use
+    yield self
+  end
 end
 
 module Enumerable
