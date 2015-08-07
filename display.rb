@@ -19,13 +19,59 @@ module Display
 
   AREAS=[]
 
+  #requires that @func only returns Chars at positive coordinates
+  #and returns lines in increasing order
+  #also AreaBounded
+  Wrap = Proc.new do
+    rows=0
+    @func.call.partition {|ch| ch.y}.each do |p| p.each do |ch|
+      if self.interior? [ch.x, ch.y+rows]
+        Termbox.tb_change_cell ch.x+@x, ch.y+@y+rows, ch.ord, ch.fg, ch.bg
+      else
+        limit = self.interior.select {|p| p[1] == ch.y+rows}.max {|p| p[0]}
+        if limit.nil? then return nil end
+        p.each do |och|
+          och.x -= limit[0]
+        end
+        rows += 1
+        redo
+      end
+    end
+    end
+  end
+
+  Clip = Proc.new do
+    @func.call.each do |ch|
+      Termbox.tb_change_cell ch.x+@x, ch.y+@y, ch.ord, ch.fg, ch.bg if self.interior? [ch.x, ch.y]
+    end
+  end
+
+  module AreaTail
+    def self.extend_object(base)
+      base.extend(AreaWrap)
+      base.instance_variable_set(:@linesShift, 0)
+      super
+    end
+
+    def func_lines
+      super.reverse
+    end
+
+    def display
+      @func.call.partition {|ch| ch.y}.reverse.each do |part|
+        part[-1].xjj
+      end
+    end
+  end
+
   class Area
     attr_accessor :x, :y, :func, :sudo_func
-    def initialize(x, y, func, sudo_func=proc{[]})
+    def initialize(x, y, func, display, sudo_func=proc{[]})
       @x = x
       @y = y
       @func = func
       @sudo_func = sudo_func
+      define_singleton_method(:display, display) unless display == :default
     end
 
     def display
@@ -56,8 +102,8 @@ module Display
 
   class AreaBounded < Area
     attr_writer :border, :interior
-    def initialize(x, y, func, border: nil, interior: nil, dispBorder: true)
-      super x, y, func
+    def initialize(x, y, func, display, sudo_func=proc{[]}, border: nil, interior: nil, dispBorder: true)
+      super x, y, func, display, sudo_func
       @border = border
       @interior = interior
       self.extend DisplayBorder if dispBorder
@@ -94,41 +140,15 @@ module Display
       interior.include?(p)
     end
 
-    def display
-      @func.call.each do |ch|
-        Termbox.tb_change_cell ch.x+@x, ch.y+@y, ch.ord, ch.fg, ch.bg if self.interior? [ch.x, ch.y]
-      end
-    end
+    define_method(:display, Display::Clip)
   end
 
   #TODO: MAYBE ADD A METHOD TO AREA THAT JUST RUNS @FUNC.CALL SO THAT WE CAN ADD DIFFERENT WAYS OF INTERPRETING THE DATA FROM @FUNC (LIKE TAIL)
 
-  module AreaWrap
-    #requires that @func only returns Chars at positive coordinates
-    def display
-      grid=[]
-      rows=0
-      @func.call.partition {|ch| ch.y}.each do |p| p.each do |ch|
-        if self.interior? [ch.x, ch.y+rows]
-          Termbox.tb_change_cell ch.x+@x, ch.y+@y+rows, ch.ord, ch.fg, ch.bg
-        else
-          limit = self.interior.select {|p| p[1] == ch.y+rows}.max {|p| p[0]}
-          if limit.nil? then return end
-          p.each do |och|
-            och.x -= limit[0]
-          end
-          rows += 1
-          redo
-        end
-      end
-      end
-    end
-  end
-
   class AreaRectangle < AreaBounded
     attr_reader :a, :b
-    def initialize(a, b, func, dispBorder: true)
-      super a[0], a[1], func, dispBorder: dispBorder
+    def initialize(a, b, func, display, sudo_func=proc{[]}, dispBorder: true)
+      super a[0], a[1], func, display, sudo_func, dispBorder: dispBorder
       @a = a
       @b = b
       @border = border
