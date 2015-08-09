@@ -6,6 +6,12 @@ module Hacks
   end
 end
 
+class Proc
+  def << block
+    proc { |*args| self.call( block.to_proc.call(*args) ) }
+  end
+end
+
 class Object
   def enum_func
     binding.of_caller(1).eval('return enum_for(__method__) unless block_given?')
