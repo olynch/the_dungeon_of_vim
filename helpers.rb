@@ -70,7 +70,8 @@ class Proc
   end
 
   def << block
-    proc { |*args| self.call( block.to_proc.call(*args) ) }
+    s = self
+    proc {|*args| instance_exec(instance_exec(*args, &block), &s)}
   end
 end
 
