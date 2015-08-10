@@ -230,7 +230,6 @@ class DoorHidden < Door
   end
 end
 
-
 class Map
   attr_accessor :width, :height
   def initialize(width, height, grid=nil)

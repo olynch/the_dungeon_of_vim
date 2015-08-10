@@ -4,64 +4,68 @@ require './map.rb'
 
 module Display
   @text = ""
-  def Display.text
-    @text
-  end
-  def Display.text=(t)
-    @text=t
+  class << self
+    attr_accessor :text
   end
 
   def Display.display()
     Termbox.tb_clear
-    AREAS.each {|a| a.display; a.sudo_display}
+    AREAS.each do |a|
+      a.display.each do |ch|
+        Termbox.tb_change_cell ch.x, ch.y, ch.ord, ch.fg, ch.bg
+      end
+      a.sudo_display
+    end
     Termbox.tb_present
   end
 
   AREAS=[]
 
+  Shift = Proc.new do |list=nil|
+  p "Shift"
+    list ||= @func.call
+    list.map do |ch|
+      Char.new(ch.x+@x, ch.y+@y, ch.ord, ch.fg, ch.bg)
+    end
+  end
+
+  Clip = Proc.new do |list=nil|
+  p "Clip"
+    list ||= @func.call
+    list.select {|ch| self.interior? [ch.x, ch.y]}
+  end
+
   #requires that @func only returns Chars at positive coordinates
   #and returns lines in increasing order
   #also AreaBounded
-  Wrap = Proc.new do
+  Wrap = Proc.new do |list=nil|
+  p "Wrap"
+    list ||= @func.call
+    ret = []
     rows=0
-    @func.call.partition {|ch| ch.y}.each do |p| p.each do |ch|
-      if self.interior? [ch.x, ch.y+rows]
-        Termbox.tb_change_cell ch.x+@x, ch.y+@y+rows, ch.ord, ch.fg, ch.bg
+    list.partition {|ch| ch.y}.sort_by {|p| p[0].y}.each do |p| p.each do |ch|
+      if ch.x < w
+        ret << Char.new(ch.x, ch.y+rows, ch.ord, ch.fg, ch.bg)
       else
-        limit = self.interior.select {|p| p[1] == ch.y+rows}.max {|p| p[0]}
-        if limit.nil? then return nil end
         p.each do |och|
-          och.x -= limit[0]
+          och.x -= w
         end
         rows += 1
         redo
       end
     end
     end
+    ret
   end
 
-  Clip = Proc.new do
-    @func.call.each do |ch|
-      Termbox.tb_change_cell ch.x+@x, ch.y+@y, ch.ord, ch.fg, ch.bg if self.interior? [ch.x, ch.y]
+  Tail = Proc.new do |list=nil|
+  p "Tail"
+    list ||= @func.call
+    unless list.empty?
+      rows = list.map {|ch| ch.y}.max-h+1
+      list.each {|ch| ch.y -= rows} if rows > 0
     end
-  end
-
-  module AreaTail
-    def self.extend_object(base)
-      base.extend(AreaWrap)
-      base.instance_variable_set(:@linesShift, 0)
-      super
-    end
-
-    def func_lines
-      super.reverse
-    end
-
-    def display
-      @func.call.partition {|ch| ch.y}.reverse.each do |part|
-        part[-1].xjj
-      end
-    end
+    list
   end
 
   class Area
@@ -71,14 +75,10 @@ module Display
       @y = y
       @func = func
       @sudo_func = sudo_func
-      define_singleton_method(:display, display) unless display == :default
+      define_singleton_method(:display, proc{instance_exec nil, &display}) unless display == :default
     end
 
-    def display
-      @func.call.each do |ch|
-        Termbox.tb_change_cell ch.x+@x, ch.y+@y, ch.ord, ch.fg, ch.bg
-      end
-    end
+    define_method(:display, Display::Shift)
 
     def sudo_display
       @sudo_func.call.each do |ch|
@@ -140,7 +140,7 @@ module Display
       interior.include?(p)
     end
 
-    define_method(:display, Display::Clip)
+    define_method(:display, Display::Shift << Display::Clip)
   end
 
   #TODO: MAYBE ADD A METHOD TO AREA THAT JUST RUNS @FUNC.CALL SO THAT WE CAN ADD DIFFERENT WAYS OF INTERPRETING THE DATA FROM @FUNC (LIKE TAIL)
