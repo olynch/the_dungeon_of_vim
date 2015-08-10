@@ -1,8 +1,10 @@
 require 'binding_of_caller'
 
 module Hacks
-  def self.caller_object
-    binding.of_caller(2).eval('self')
+  def self.caller_object(num=0)
+    binding.of_caller(2+num).eval('self')
+  end
+end
   end
 end
 
