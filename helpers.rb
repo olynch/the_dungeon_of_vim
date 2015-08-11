@@ -100,13 +100,11 @@ class Array
   end
 
   def neighborhood
-    ret = []
-    (-1..1).each do |i|
-      (-1..1).each do |j|
-        ret << [self[0]+i, self[1]+j]
+    (-1..1).flat_map do |i|
+      (-1..1).map do |j|
+        [self[0]+i, self[1]+j]
       end
     end
-    return ret
   end
 
   def move(dir, amt)
