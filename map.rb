@@ -115,7 +115,7 @@ class Player < Thing
     elsif t.is_a? Key
       self.take t
     elsif t.is_a? Door
-      key = @inventory.find_object {|k| k.is_a?(Key) && k.door_name == t.name}
+      key = @inventory.find {|k| k.is_a?(Key) && k.door_name == t.name}
       unless key.nil?
         t.present key
         @inventory.delete_first(key)
