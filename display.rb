@@ -144,11 +144,12 @@ module Display
   class AreaRectangle < AreaBounded
     attr_reader :a, :b
     def initialize(a, b, func, display, sudo_func=proc{[]}, dispBorder: true)
-      super a[0], a[1], func, display, sudo_func, dispBorder: dispBorder
       @a = a
       @b = b
-      @border = border
-      @interior = interior
+      super a[0], a[1], func, display, sudo_func, dispBorder: dispBorder,
+        border: ((-1..w).flat_map {|i| [[i, -1], [i, h]]} |
+                 (-1..h).flat_map {|i| [[-1, i], [w, i]]} ).uniq,
+        interior: ((0..w-1).to_a.product (0..h-1).to_a)
     end
 
     def a=(a)
@@ -167,16 +168,6 @@ module Display
 
     def w
       @b[0]-@a[0]
-    end
-
-    def border
-      ((-1..w).flat_map {|i| [[i, -1], [i, h]]} |
-       (-1..h).flat_map {|i| [[-1, i], [w, i]]} )
-      .uniq
-    end
-
-    def interior
-      (0..w-1).to_a.product (0..h-1).to_a
     end
 
     def interior?(xy)
