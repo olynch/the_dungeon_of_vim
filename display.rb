@@ -40,7 +40,7 @@ module Display
     list ||= @func.call
     ret = []
     rows=0
-    list.partition {|ch| ch.y}.sort_by {|p| p[0].y}.each do |p| p.each do |ch|
+    list.group_by {|ch| ch.y}.values.sort_by {|p| p[0].y}.each do |p| p.each do |ch|
       if ch.x < w
         ret << Char.new(ch.x, ch.y+rows, ch.ord, ch.fg, ch.bg)
       else
@@ -120,7 +120,7 @@ module Display
 
     def interior
       @interior ||
-        self.border.partition {|p| p[0]}.flat_map do |p|
+        self.border.group_by {|p| p[0]}.values.flat_map do |p|
         p.sort {|a, b| a[1] <=> b[1]}
         .each_slice(2).flat_map do |ps|
           if ps.length == 1
