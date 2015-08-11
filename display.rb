@@ -22,7 +22,6 @@ module Display
   AREAS=[]
 
   Shift = Proc.new do |list=nil|
-  p "Shift"
     list ||= @func.call
     list.map do |ch|
       Char.new(ch.x+@x, ch.y+@y, ch.ord, ch.fg, ch.bg)
@@ -30,7 +29,6 @@ module Display
   end
 
   Clip = Proc.new do |list=nil|
-  p "Clip"
     list ||= @func.call
     list.select {|ch| self.interior? [ch.x, ch.y]}
   end
@@ -39,7 +37,6 @@ module Display
   #and returns lines in increasing order
   #also AreaBounded
   Wrap = Proc.new do |list=nil|
-  p "Wrap"
     list ||= @func.call
     ret = []
     rows=0
@@ -59,7 +56,6 @@ module Display
   end
 
   Tail = Proc.new do |list=nil|
-  p "Tail"
     list ||= @func.call
     unless list.empty?
       rows = list.map {|ch| ch.y}.max-h+1
