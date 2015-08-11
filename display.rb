@@ -115,7 +115,7 @@ module Display
           end
         end
         return ret
-      end
+      end.call
     end
 
     def interior

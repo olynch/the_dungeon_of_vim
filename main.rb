@@ -27,18 +27,24 @@ def keyboard_controls()
     when 0x1B
       exit
     when 0xFFFF-18
+      move = true
       where = [?y, -1]
     when 0xFFFF-19
+      move = true
       where = [?y, 1]
     when 0xFFFF-20
+      move = true
       where = [?x, -1]
     when 0xFFFF-21
+      move = true
       where = [?x, 1]
     end
-    whereto = [Maptest::JOHN.x, Maptest::JOHN.y].move(*where)
-    Maptest::JOHN.move(*where) unless Maptest::MAP[*whereto].collision?
-    Maptest::MAP[*whereto].each do |t|
-      Maptest::JOHN.acton(t)
+    if move
+      whereto = [Maptest::JOHN.x, Maptest::JOHN.y].move(*where)
+      Maptest::JOHN.move(*where) unless Maptest::MAP[*whereto].collision?
+      Maptest::MAP[*whereto].each do |t|
+        Maptest::JOHN.acton(t)
+      end
     end
   end
   Maptest::MAP.each_thing.eager {|t| t.update} #TODO: Make this a thing
