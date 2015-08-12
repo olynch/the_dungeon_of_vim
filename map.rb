@@ -228,6 +228,10 @@ class DoorHidden < Door
   def ch
     if @open then ?¦ else ?# end
   end
+
+  def inspect
+    "DoorHidden.new(#{@name}, #{@open})"
+  end
 end
 
 class Map
