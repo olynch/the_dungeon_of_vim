@@ -110,7 +110,7 @@ module Display
         ret = []
         interior = self.interior
         interior.each do |p|
-          p.neighborhood.each do |n|
+          p.neighbors.each do |n|
             ret << n unless interior.include? n
           end
         end

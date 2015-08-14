@@ -99,7 +99,7 @@ class Array
     self.delete_at(self.index(obj))
   end
 
-  def neighborhood
+  def neighbors
     (-1..1).flat_map do |i|
       (-1..1).map do |j|
         [self[0]+i, self[1]+j]
