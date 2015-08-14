@@ -174,6 +174,15 @@ module Display
       xy[0] >= 0 && xy[0] < w && xy[1] >= 0 && xy[1] < w
     end
   end
+
+  class AreaCircle < AreaBounded
+    attr_reader :r
+    def initialize(x, y, r, func, display, sudo_func=proc{[]}, dispBorder: true)
+      super x, y, func, display, sudo_func, dispBorder: dispBorder,
+        border: 1.upto((2*Math::PI*(r+1)).ceil).flat_map {|c| t = c.to_f/r; ([:ceil, :floor]*2).combination(2).map {|c| [Math.cos(t).*(r).send(c[0]), Math.sin(t).*(r).send(c[1])]}}.uniq
+      @r = r
+    end
+  end
 end
 
 class Char

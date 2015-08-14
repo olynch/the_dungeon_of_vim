@@ -65,11 +65,13 @@ end
 begin
   Termbox.tb_init
   #Display::AREAS << Display::AreaRectangle.new([10,1], [15,11], Maptest::JOHN.method("disp"))
-  Display::AREAS << Display::AreaRectangle.new([1,1], [21,11], Maptest::JOHN.method("disp"), :default)
-  Display::AREAS << Display::AreaRectangle.new([23,1], [43,11], Maptest::MAP.method("disp"), :default)
-  Display::AREAS << Display::AreaRectangle.new([50,1], [100,50], proc {Display.text.disp}, Display::Shift << Display::Clip << Display::Tail << Display::Wrap)
+  #Display::AREAS << Display::AreaRectangle.new([1,1], [21,11], Maptest::JOHN.method("disp"), :default)
+  Display::AREAS << test= Display::AreaCircle.new(10,10, 5, Maptest::JOHN.method("disp"), :default)
+  #Display::AREAS << Display::AreaRectangle.new([23,1], [43,11], Maptest::MAP.method("disp"), :default)
+  #Display::AREAS << Display::AreaRectangle.new([50,1], [100,50], proc {Display.text.disp}, Display::Shift << Display::Clip << Display::Tail << Display::Wrap)
   #Display::AREAS << Display::Area.new(20, 20, proc{Display.text.disp})
   #Display::AREAS << test = Display::AreaWrap.new(2, 2, proc {Display.text.disp}, border: (-1..10).flat_map {|i| [[i,-1], [-1,i], [10,i], [i,10]]}.uniq)
+  p test.border
   loop do
     main
   end
