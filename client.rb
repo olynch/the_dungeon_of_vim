@@ -1,9 +1,9 @@
 require 'socket'
+require './helpers.rb'
 
 s = TCPSocket.new 'localhost', 2000
-
-puts s.gets
-s.puts ""
-sleep 1
-
+STDIN.each_line do |l|
+  if l == "\n" then break end
+  s.puts l
+end
 s.close
