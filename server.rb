@@ -3,6 +3,8 @@ Clients=[]
 
 Clients << TCPServer.new(2000)
 
+env = binding
+
 loop do
   res = select Clients
   res[0].each do |s|
@@ -12,7 +14,7 @@ loop do
       s.close
       Clients.delete(s)
     else
-      eval s.gets
+      env.eval s.gets
     end
   end
 end
