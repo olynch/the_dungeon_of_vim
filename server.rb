@@ -1,4 +1,28 @@
+require './map.rb'
+require './maptest.rb'
+require './display.rb'
 require 'socket'
+
+module ClientBehavior
+  def client_callable?(sym)
+    @client_callable = [:moveUp]
+    @client_callable.include? sym
+  end
+  def client_readable
+    @client_readable = [:inventory, :disp]
+    @client_readable
+  end
+end
+
+class Player
+  include ClientBehavior
+  def moveUp
+    whereTo = [self.x, self.y].move(?y, 1)
+    self.move(?y, 1) unless self.map[*whereTo].collision?
+    self.map[*whereTo].each {|t| self.acton(t)}
+  end
+end
+
 Clients=[]
 
 Clients << TCPServer.new(2000)
@@ -10,11 +34,16 @@ loop do
   res[0].each do |s|
     if s == Clients[0]
       Clients << s.accept
+      puts Maptest::JOHN.client_readable.map {|m| [m, Maptest::JOHN.send(m)]}.to_h.to_s
+      Clients[-1].puts Maptest::JOHN.client_readable.map {|m| [m, Maptest::JOHN.send(m)]}.to_h.to_s
     elsif s.eof?
       s.close
       Clients.delete(s)
     else
-      env.eval s.gets
+      cmd = s.gets
+      Maptest::JOHN.send cmd if Maptest::JOHN.client_callable? cmd
+      s.puts Maptest::JOHN.client_readable.map {|m| [m, Maptest::JOHN.send(m)]}.to_h.to_s
     end
   end
 end
+
