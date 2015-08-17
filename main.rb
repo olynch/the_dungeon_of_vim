@@ -35,10 +35,6 @@ def keyboard_controls()
   Maptest::MAP.each_thing.eager {|t| t.update} #TODO: Make this a thing
 end
 
-def win
-  exit
-end
-
 def main()
   if @n.nil? then @n = 0 end
   Display.text << "#{@n} Hello, world. This is a long paragraph so that it gets split accross multiple lines. Maybe even three if we're lucky? Pretty please?\n"
