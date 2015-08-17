@@ -118,6 +118,7 @@ module Display
       end.call
     end
 
+    #TODO: Bug! if there's two in a row, this doesn't treat it correctly
     def interior
       @interior ||
         self.border.group_by {|p| p[0]}.values.flat_map do |p|
@@ -175,11 +176,13 @@ module Display
     end
   end
 
+  #TODO: Bug! the circle is too thick
   class AreaCircle < AreaBounded
     attr_reader :r
     def initialize(x, y, r, func, display, sudo_func=proc{[]}, dispBorder: true)
       super x, y, func, display, sudo_func, dispBorder: dispBorder,
         border: 1.upto((2*Math::PI*(r+1)).ceil).flat_map {|c| t = c.to_f/r; ([:ceil, :floor]*2).combination(2).map {|c| [Math.cos(t).*(r).send(c[0]), Math.sin(t).*(r).send(c[1])]}}.uniq
+      #TODO: add interior
       @r = r
     end
   end
@@ -199,6 +202,9 @@ class Char
   end
   def display
     Termbox.tb_change_cell @x, @y, @ch.ord, @fg, @bg
+  end
+  def inspect
+    "Char.new(#{@x}, #{@y}, #{@ch}, #{@fg}, #{@bg})"
   end
 end
 
