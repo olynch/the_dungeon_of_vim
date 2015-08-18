@@ -40,7 +40,6 @@ loop do
       Clients.delete(s)
     else
       cmd = s.gets.chomp.to_sym
-      p cmd
       Maptest::JOHN.send cmd if Maptest::JOHN.client_callable? cmd
       s.puts Maptest::JOHN.client_readable.map {|m| [m, Maptest::JOHN.send(m)]}.to_h.to_s
     end
