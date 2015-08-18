@@ -2,6 +2,7 @@ require 'termbox'
 require 'socket'
 require './display.rb'
 require './helpers.rb'
+require 'yaml'
 Termbox.initialize_library
 s = TCPSocket.new 'localhost', 2000
 Map = []
@@ -33,7 +34,8 @@ end
 
 def to_server(s)
   loop do
-    s.puts keyboard_controls
+    s.puts YAML.dump(keyboard_controls)
+    s.puts "\n"
   end
 end
 

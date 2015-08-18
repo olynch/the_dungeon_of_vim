@@ -2,6 +2,7 @@ require './map.rb'
 require './maptest.rb'
 require './display.rb'
 require 'socket'
+require 'yaml'
 
 module ClientBehavior
   def client_callable?(sym)
@@ -39,7 +40,7 @@ loop do
       s.close
       Clients.delete(s)
     else
-      cmd = s.gets.chomp.to_sym
+      cmd = YAML.load(s.gets "")
       Maptest::JOHN.send cmd if Maptest::JOHN.client_callable? cmd
       s.puts Maptest::JOHN.client_readable.map {|m| [m, Maptest::JOHN.send(m)]}.to_h.to_s
     end
