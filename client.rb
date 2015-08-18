@@ -5,7 +5,7 @@ require './helpers.rb'
 require 'yaml'
 Termbox.initialize_library
 s = TCPSocket.new 'localhost', 2000
-Map = []
+MapData = []
 
 def keyboard_controls
   ev = Termbox::Event.new
@@ -27,7 +27,7 @@ end
 
 def from_server(s)
   loop do
-    Map.replace (eval s.gets)[:disp]
+    MapData.replace (eval s.gets)[:disp]
     Display.display
   end
 end
@@ -41,7 +41,7 @@ end
 
 begin
   Termbox.tb_init
-  Display::AREAS << Display::AreaRectangle.new([1,1], [21,11], proc{Map}, :default)
+  Display::AREAS << Display::AreaRectangle.new([1,1], [21,11], proc{MapData}, :default)
   [
     Thread.new {from_server(s)},
     Thread.new {to_server(s)}
