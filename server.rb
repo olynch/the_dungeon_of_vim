@@ -17,8 +17,8 @@ end
 class Player
   include ClientBehavior
   def moveUp
-    whereTo = [self.x, self.y].move(?y, 1)
-    self.move(?y, 1) unless self.map[*whereTo].collision?
+    whereTo = [self.x, self.y].move(?y, -1)
+    self.move(?y, -1) unless self.map[*whereTo].collision?
     self.map[*whereTo].each {|t| self.acton(t)}
   end
 end
@@ -34,13 +34,13 @@ loop do
   res[0].each do |s|
     if s == Clients[0]
       Clients << s.accept
-      puts Maptest::JOHN.client_readable.map {|m| [m, Maptest::JOHN.send(m)]}.to_h.to_s
       Clients[-1].puts Maptest::JOHN.client_readable.map {|m| [m, Maptest::JOHN.send(m)]}.to_h.to_s
     elsif s.eof?
       s.close
       Clients.delete(s)
     else
-      cmd = s.gets
+      cmd = s.gets.chomp.to_sym
+      p cmd
       Maptest::JOHN.send cmd if Maptest::JOHN.client_callable? cmd
       s.puts Maptest::JOHN.client_readable.map {|m| [m, Maptest::JOHN.send(m)]}.to_h.to_s
     end
