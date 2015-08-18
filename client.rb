@@ -14,13 +14,13 @@ def keyboard_controls
     when 0x1B
       exit
     when 0xFFFF-18
-      :moveUp
+      [:i_move, 'y+']
     when 0xFFFF-19
-      :moveDown
+      [:i_move, 'y-']
     when 0xFFFF-20
-      :moveLeft
+      [:i_move, 'x-']
     when 0xFFFF-21
-      :moveRight
+      [:i_move, 'x+']
     end
   end
 end
@@ -35,7 +35,7 @@ end
 def to_server(s)
   loop do
     s.puts YAML.dump(keyboard_controls)
-    s.puts "\n"
+    s.puts "\n" #to terminate the message. (make this prettier?)
   end
 end
 

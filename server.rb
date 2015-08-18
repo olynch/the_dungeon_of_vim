@@ -6,7 +6,7 @@ require 'yaml'
 
 module ClientBehavior
   def client_callable?(sym)
-    @client_callable = [:moveUp]
+    @client_callable = [:i_move]
     @client_callable.include? sym
   end
   def client_readable
@@ -17,9 +17,11 @@ end
 
 class Player
   include ClientBehavior
-  def moveUp
-    whereTo = [self.x, self.y].move(?y, -1)
-    self.move(?y, -1) unless self.map[*whereTo].collision?
+  def i_move(where)
+    dir = where[0]
+    amt = (where[1] + "1").to_i
+    whereTo = [self.x, self.y].move(dir, amt)
+    self.move(dir, amt) unless self.map[*whereTo].collision?
     self.map[*whereTo].each {|t| self.acton(t)}
   end
 end
@@ -40,8 +42,8 @@ loop do
       s.close
       Clients.delete(s)
     else
-      cmd = YAML.load(s.gets "")
-      Maptest::JOHN.send cmd if Maptest::JOHN.client_callable? cmd
+      cmd, *args = YAML.load(s.gets "")
+      Maptest::JOHN.send(cmd, *args) if Maptest::JOHN.client_callable? cmd
       s.puts Maptest::JOHN.client_readable.map {|m| [m, Maptest::JOHN.send(m)]}.to_h.to_s
     end
   end
