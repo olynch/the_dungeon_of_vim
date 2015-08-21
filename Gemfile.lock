@@ -1,22 +1,22 @@
+GIT
+  remote: https://github.com/olynch/rb_termbox.git
+  revision: d86e02b58e79d9e5923ff7192a287377cb1bfa55
+  specs:
+    rb_termbox (0.2.1)
+      ffi
+
 GEM
   remote: https://rubygems.org/
   specs:
     binding_of_caller (0.7.2)
       debug_inspector (>= 0.0.1)
     debug_inspector (0.0.2)
-    ffi (1.9.6)
-    ffi (1.9.6-java)
-    rb_termbox (0.2.0)
-      ffi
+    ffi (1.9.10)
 
 PLATFORMS
-  java
   ruby
 
 DEPENDENCIES
   binding_of_caller (~> 0.7.2)
   ffi (~> 1.9.6)
-  rb_termbox (~> 0.2.0)
-
-BUNDLED WITH
-   1.10.3
+  rb_termbox (~> 0.2.1)!
