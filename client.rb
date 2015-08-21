@@ -14,9 +14,9 @@ def keyboard_controls
     when 0x1B
       exit
     when 0xFFFF-18
-      [:i_move, 'y+']
-    when 0xFFFF-19
       [:i_move, 'y-']
+    when 0xFFFF-19
+      [:i_move, 'y+']
     when 0xFFFF-20
       [:i_move, 'x-']
     when 0xFFFF-21
@@ -25,10 +25,21 @@ def keyboard_controls
   end
 end
 
+def debug(str)
+  puts "#{Time.now}:#{str}"
+end
+
 def from_server(s)
   loop do
-    MapData.replace (eval s.gets)[:disp]
+      debug "1"
+    inp = eval s.gets.chomp
+      debug "1.1"
+    puts inp
+      debug "1.2"
+    MapData.replace inp[:disp]
+      debug "2"
     Display.display
+      debug "3"
   end
 end
 
@@ -42,10 +53,18 @@ end
 begin
   Termbox.tb_init
   Display::AREAS << Display::AreaRectangle.new([1,1], [21,11], proc{MapData}, :default)
-  [
-    Thread.new {from_server(s)},
-    Thread.new {to_server(s)}
-  ].each(&:join)
+      debug "1"
+    inp = eval s.gets.chomp
+      debug "1.1"
+    puts inp
+      debug "1.2"
+    MapData.replace inp[:disp]
+      debug "2"
+    Display.display
+      debug "3"
+  Thread.new {from_server(s)}
+  Thread.new {to_server(s)}
+  loop {}
 ensure
   s.close
   Termbox.tb_shutdown
