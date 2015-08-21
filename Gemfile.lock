@@ -20,3 +20,6 @@ DEPENDENCIES
   binding_of_caller (~> 0.7.2)
   ffi (~> 1.9.6)
   rb_termbox (~> 0.2.1)!
+
+BUNDLED WITH
+   1.10.3
