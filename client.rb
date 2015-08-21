@@ -31,15 +31,8 @@ end
 
 def from_server(s)
   loop do
-      debug "1"
-    inp = eval s.gets.chomp
-      debug "1.1"
-    puts inp
-      debug "1.2"
-    MapData.replace inp[:disp]
-      debug "2"
+    MapData.replace eval(s.gets.chomp)[:disp]
     Display.display
-      debug "3"
   end
 end
 
@@ -53,15 +46,6 @@ end
 begin
   Termbox.tb_init
   Display::AREAS << Display::AreaRectangle.new([1,1], [21,11], proc{MapData}, :default)
-      debug "1"
-    inp = eval s.gets.chomp
-      debug "1.1"
-    puts inp
-      debug "1.2"
-    MapData.replace inp[:disp]
-      debug "2"
-    Display.display
-      debug "3"
   Thread.new {from_server(s)}
   Thread.new {to_server(s)}
   loop {}

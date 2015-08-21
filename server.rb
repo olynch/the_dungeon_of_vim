@@ -20,7 +20,6 @@ class Player
   def i_move(where)
     dir = where[0]
     amt = (where[1] + "1").to_i
-    p dir, amt
     whereTo = [self.x, self.y].move(dir, amt)
     self.move(dir, amt) unless self.map[*whereTo].collision?
     self.map[*whereTo].each {|t| self.acton(t)}
@@ -38,7 +37,6 @@ loop do
   res[0].each do |s|
     if s == Clients[0]
       Clients << s.accept
-      puts Maptest::JOHN.client_readable.map {|m| [m, Maptest::JOHN.send(m)]}.to_h.to_s
       Clients[1..-1].each {|s| s.puts Maptest::JOHN.client_readable.map {|m| [m, Maptest::JOHN.send(m)]}.to_h.to_s}
     elsif s.eof?
       s.close
