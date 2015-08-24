@@ -189,7 +189,7 @@ class Key < Thing
   end
 
   def inspect
-    "Key.new(#{@door_name})"
+    "Key.new(#{@door_name.inspect})"
   end
 end
 
