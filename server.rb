@@ -26,26 +26,30 @@ class Player
   end
 end
 
-Clients=[]
+class DOVServer
+  def initialize(port)
+    @server = TCPServer.new port
+    puts "Started DOV server on port #{port}"
+    @clients = [@server]
+  end
 
-Clients << TCPServer.new(2000)
-
-env = binding
-
-loop do
-  res = select Clients
-  res[0].each do |s|
-    if s == Clients[0]
-      Clients << s.accept
-      Clients[1..-1].each {|s| s.puts Maptest::JOHN.client_readable.map {|m| [m, Maptest::JOHN.send(m)]}.to_h.to_s}
-    elsif s.eof?
-      s.close
-      Clients.delete(s)
-    else
-      cmd, *args = JSON.load(s.gets)
-      Maptest::JOHN.send(cmd, *args) if Maptest::JOHN.client_callable? cmd.to_sym
-      Clients[1..-1].each {|s| s.puts Maptest::JOHN.client_readable.map {|m| [m, Maptest::JOHN.send(m)]}.to_h.to_s}
+  def run
+    loop do
+      (select @clients)[0].each do |s|
+        if s == @server
+          @clients << @server.accept
+          @clients[1..-1].each {|s| s.puts Maptest::JOHN.client_readable.map {|m| [m, Maptest::JOHN.send(m)]}.to_h.to_s}
+        elsif s.eof?
+          s.close
+          @clients.delete(s)
+        else
+          cmd, *args = JSON.load(s.gets)
+          Maptest::JOHN.send(cmd, *args) if Maptest::JOHN.client_callable? cmd.to_sym
+          @clients[1..-1].each {|s| s.puts Maptest::JOHN.client_readable.map {|m| [m, Maptest::JOHN.send(m)]}.to_h.to_s}
+        end
+      end
     end
   end
 end
 
+DOVServer.new(2000).run

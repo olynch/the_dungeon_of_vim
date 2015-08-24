@@ -4,8 +4,6 @@ require './display.rb'
 require './helpers.rb'
 require 'json'
 Termbox.initialize_library
-s = TCPSocket.new 'localhost', 2000
-MapData = []
 
 def keyboard_controls
   ev = Termbox::Event.new
@@ -25,31 +23,47 @@ def keyboard_controls
   end
 end
 
-def debug(str)
-  puts "#{Time.now}:#{str}"
-end
-
-def from_server(s)
-  loop do
-    MapData.replace eval(s.gets.chomp)[:disp]
-    Display.display
+class DOVClient
+  attr_accessor :data
+  def initialize(port)
+    @server = TCPSocket.new 'localhost', port
+    @data = {}
   end
-end
 
-def to_server(s)
-  loop do
-    s.puts JSON.dump(keyboard_controls)
+  def run
+    [
+      Thread.new {from_server},
+      Thread.new {to_server}
+    ].map(&:join)
   end
+
+  def close
+    @server.close
+  end
+
+  private
+  def from_server
+    loop do
+      @data.replace eval(@server.gets.chomp)
+      Display::display
+    end
+  end
+
+  def to_server
+    loop do
+      @server.puts JSON.dump(keyboard_controls)
+    end
+  end
+
 end
 
 begin
   Termbox.tb_init
-  Display::AREAS << Display::AreaRectangle.new([1,1], [21,11], proc{MapData}, :default)
-  Thread.new {from_server(s)}
-  Thread.new {to_server(s)}
-  loop {}
+  c = DOVClient.new(2000)
+  Display::AREAS << Display::AreaRectangle.new([1,1], [21,11], proc{c.data[:disp]}, :default)
+  c.run
 ensure
-  s.close
+  c.close
   Termbox.tb_shutdown
 end
 
