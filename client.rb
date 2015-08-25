@@ -66,9 +66,3 @@ ensure
   c.close
   Termbox.tb_shutdown
 end
-
-
-#STDIN.each_line do |l|
-  #if l == "\n" then break end
-  #s.puts l
-#end
