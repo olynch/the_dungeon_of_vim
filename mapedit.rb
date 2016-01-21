@@ -6,7 +6,7 @@ $buffers = [cur]
 
 class MapBuffer
   #attr_accessor :cursor, :mode, :history, :command, :map
-  
+
   def initialize(map)
     @map = map
     @cursor = { x: 0, y: 0}
@@ -34,7 +34,7 @@ class MapBuffer
 
   def disp_command
     if @command != ""
-      (":" + @command).disp 
+      (":" + @command).disp
     else
       @command_res.disp
     end
