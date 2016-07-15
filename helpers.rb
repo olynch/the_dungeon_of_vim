@@ -83,6 +83,14 @@ class Object
   def use
     yield self
   end
+
+  def ifnil(x)
+    if self.nil?
+      x
+    else
+      self
+    end
+  end
 end
 
 module Enumerable
